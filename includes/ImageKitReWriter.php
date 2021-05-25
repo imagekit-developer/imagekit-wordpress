@@ -1,331 +1,304 @@
 <?php
-
 class ImageKitReWriter {
-	/**
-	 * @var string
-	 */
-	private $cdn_url = '';
+  /**
+   * @var string
+   */
+  private $cdn_url = '';
 
-	private $_regexps = array();
-	private $_placeholders = array();
-	private $imagekit_options;
+  private $_regexps = array();
+  private $_placeholders = array();
+  private $imagekit_options;
 
-	/**
-	 * @var string
-	 */
-	private $site_url = '';
+  /**
+   * @var string
+   */
+  private $site_url = '';
 
-	/**
-	 * Constructor
-	 *
-	 * @param string $cdn_url
-	 * @param string $site_url
-	 */
-	public function __construct( $cdn_url, $site_url, $imagekit_options ) {
-		// Store cdn url & site url in property
-		$this->site_url = $site_url;
-		$this->cdn_url = $cdn_url;
-		
-		// default values for all options
-		$imagekit_options["file_type"] = !empty($imagekit_options["file_type"]) ? $imagekit_options["file_type"] : "*.gif;*.png;*.jpg;*.jpeg;*.bmp;*.ico;*.webp";
-		$imagekit_options["custom_files"] = !empty($imagekit_options["custom_files"]) ? $imagekit_options["custom_files"] : "favicon.ico\ncustom-directory";
-		$imagekit_options["reject_files"] = !empty($imagekit_options["reject_files"]) ? $imagekit_options["reject_files"] : "wp-content/uploads/wpcf7_captcha/*\nwp-content/uploads/imagerotator.swf\ncustom-directory*.mp4";
+  /**
+   * Constructor
+   *
+   * @param string $cdn_url
+   * @param string $site_url
+   */
+  public function __construct($cdn_url, $site_url, $imagekit_options) {
+    // Store cdn url & site url in property
+    $this->site_url = $site_url;
+    $this->cdn_url = $cdn_url;
 
-		$this->imagekit_options = $imagekit_options;
-		ImageKitHelper::log_debug("Rewriter Options", array("site_url" => $site_url, "cdn_url" => $cdn_url, "options" => $imagekit_options));
-	}
+    // default values for all options
+    $imagekit_options["file_type"] = !empty($imagekit_options["file_type"]) ? $imagekit_options["file_type"] : "*.gif;*.png;*.jpg;*.jpeg;*.bmp;*.ico;*.webp";
+    $imagekit_options["custom_files"] = !empty($imagekit_options["custom_files"]) ? $imagekit_options["custom_files"] : "favicon.ico\ncustom-directory";
+    $imagekit_options["reject_files"] = !empty($imagekit_options["reject_files"]) ? $imagekit_options["reject_files"] : "wp-content/uploads/wpcf7_captcha/*\nwp-content/uploads/imagerotator.swf\ncustom-directory*.mp4";
 
-	protected function exclude_asset($path) {
-		$reject_files = explode(PHP_EOL,$this->imagekit_options['reject_files']);
+    $this->imagekit_options = $imagekit_options;
+    ImageKitHelper::log_debug("Rewriter Options", array(
+      "site_url" => $site_url,
+      "cdn_url" => $cdn_url,
+      "options" => $imagekit_options
+    ));
+  }
 
-		foreach ( $reject_files as $reject_file ) {
-			if ( $reject_file != '' ) {
-				$reject_file = ImageKitHelper::replace_folder_placeholders( $reject_file );
+  protected function exclude_asset($path) {
+    $reject_files = explode(PHP_EOL, $this->imagekit_options['reject_files']);
 
-				$reject_file = ImageKitHelper::normalize_file( $reject_file );
+    foreach ($reject_files as $reject_file) {
+      if ($reject_file != '') {
+        $reject_file = ImageKitHelper::replace_folder_placeholders($reject_file);
 
-				$reject_file_regexp = '~^('
-					. ImageKitHelper::get_regexp_by_mask( $reject_file ) . ')~i';
+        $reject_file = ImageKitHelper::normalize_file($reject_file);
 
-				if ( preg_match( $reject_file_regexp, $path ) ) {
-					return true;
-				}
-			}
-		}
+        $reject_file_regexp = '~^(' . ImageKitHelper::get_regexp_by_mask($reject_file) . ')~i';
 
-		return false;
-	}
+        if (preg_match($reject_file_regexp, $path)) {
+          return true;
+        }
+      }
+    }
 
-	protected function get_dir_scope() {
-		$input = explode(',', $this->dirs);
+    return false;
+  }
 
-        // default
-		if ($this->dirs == '' || count($input) < 1) {
-			return 'wp\-content|wp\-includes';
-		}
+  protected function get_dir_scope() {
+    $input = explode(',', $this->dirs);
 
-		return implode('|', array_map('quotemeta', array_map('trim', $input)));
-	}
+    // default
+    if ($this->dirs == '' || count($input) < 1) {
+      return 'wp\-content|wp\-includes';
+    }
 
-	protected function extract_img_details($content) {
-		preg_match_all('/(.*)-([0-9]+)x([0-9]+)\.([^"\']+)/', $content, $matches);
+    return implode('|', array_map('quotemeta', array_map('trim', $input)));
+  }
 
-		$lookup = array("raw", "urlWithoutHostAndParam", 'w', 'h', 'type');
-		$data = array();
-		foreach ($matches as $k => $v) {
-			foreach ($v as $ind => $val) {
-// 				echo '<h1>'.$val.'</h1>';
-				if (!array_key_exists($ind, $data)) {
-					$data[$ind] = array();
-				}
+  protected function extract_img_details($content) {
+    preg_match_all('/(.*)-([0-9]+)x([0-9]+)\.([^"\']+)/', $content, $matches);
 
-				$key = $lookup[$k];
-				if ($key === 'type') {
-					if (strpos($val, '?') !== false) {
-						$parts = explode('?', $val);
-						$data[$ind]['type'] = $parts[0];
-						$data[$ind]['extra'] = $parts[1];
-					} else {
-						$data[$ind]['type'] = $val;
-						$data[$ind]['extra'] = '';
-					}
-				} else {
-					$data[$ind][$key] = $val;
-				}
-			}
-		}
+    $lookup = array(
+      "raw",
+      "urlWithoutHostAndParam",
+      'w',
+      'h',
+      'type'
+    );
+    $data = array();
+    foreach ($matches as $k => $v) {
+      foreach ($v as $ind => $val) {
+        // 				echo '<h1>'.$val.'</h1>';
+        if (!array_key_exists($ind, $data)) {
+          $data[$ind] = array();
+        }
 
-		return $data;
-	}
+        $key = $lookup[$k];
+        if ($key === 'type') {
+          if (strpos($val, '?') !== false) {
+            $parts = explode('?', $val);
+            $data[$ind]['type'] = $parts[0];
+            $data[$ind]['extra'] = $parts[1];
+          }
+          else {
+            $data[$ind]['type'] = $val;
+            $data[$ind]['extra'] = '';
+          }
+        }
+        else {
+          $data[$ind][$key] = $val;
+        }
+      }
+    }
 
-	protected function rewrite_url($matches) {
-		list( $match, $quote, $url, , , , $path ) = $matches;
-		$path = ltrim( $path, '/' );
-		
-		if ($this->exclude_asset($path)) {
-			ImageKitHelper::log_debug("Exluded Rewriting", $path);
-			return $quote . $url;
-		}
-		$site_url = $this->site_url;
-		$final_url = "";
+    return $data;
+  }
 
-		// $img = $this->extract_img_details($path)[0];
-		// stop using ImageKit transformation due to file names like backpain-360x124.jpg where backpain.jpg does't exist
-		if(false) {
-			$transformation = array();
-			if($img['w']) array_push($transformation, 'w-'.$img['w']);
-			if($img['h']) array_push($transformation, 'h-'.$img['h']);
-			$transformationExist = strpos($img['urlWithoutHostAndParam'], 'tr');
+  protected function rewrite_url($matches) {
+    list($match, $quote, $url, , , , $path) = $matches;
+    $path = ltrim($path, '/');
 
-			if($transformationExist === false) {
-				$transformationString = "tr:" . implode(',', $transformation) . "/";
-			} else {
-				$transformationString = "";
-			}
+    if ($this->exclude_asset($path)) {
+      ImageKitHelper::log_debug("Exluded Rewriting", $path);
+      return $quote . $url;
+    }
+    $site_url = $this->site_url;
+    $final_url = "";
 
-			$to_replace = $img['raw'];
-			$extra_params = $img['extra'] ? '&amp;'.$img['extra'] : '';
-			$final_url = $this->cdn_url.$transformationString.$img['urlWithoutHostAndParam'].'.'.$img['type'].$extra_params;
-		} else {
-			$final_url = $this->cdn_url . $path;
-		}
+    // $img = $this->extract_img_details($path)[0];
+    // stop using ImageKit transformation due to file names like backpain-360x124.jpg where backpain.jpg does't exist
+    if (false) {
+      $transformation = array();
+      if ($img['w']) array_push($transformation, 'w-' . $img['w']);
+      if ($img['h']) array_push($transformation, 'h-' . $img['h']);
+      $transformationExist = strpos($img['urlWithoutHostAndParam'], 'tr');
 
-		ImageKitHelper::log_debug("Rewriting", $path." => ".$final_url);
+      if ($transformationExist === false) {
+        $transformationString = "tr:" . implode(',', $transformation) . "/";
+      }
+      else {
+        $transformationString = "";
+      }
 
-		return $quote . $final_url;
-	}
+      $to_replace = $img['raw'];
+      $extra_params = $img['extra'] ? '&amp;' . $img['extra'] : '';
+      $final_url = $this->cdn_url . $transformationString . $img['urlWithoutHostAndParam'] . '.' . $img['type'] . $extra_params;
+    }
+    else {
+      $final_url = $this->cdn_url . $path;
+    }
 
-	public function replace_all_links( $buffer ) {
-		$this->fill_regexps();
+    ImageKitHelper::log_debug("Rewriting", $path . " => " . $final_url);
 
-		ImageKitHelper::log_debug("IK_REGEXPS", $this->_regexps);
+    return $quote . $final_url;
+  }
 
-		$srcset_pattern = '~srcset\s*=\s*[\"\'](.*?)[\"\']~';
-		$buffer = preg_replace_callback(
-			$srcset_pattern, array( $this, '_srcset_replace_callback' ), $buffer
-		);
+  public function replace_all_links($buffer) {
+    $this->fill_regexps();
 
-		foreach ( $this->_regexps as $regexp ) {
-			$buffer = preg_replace_callback(
-				$regexp, array( $this, 'rewrite_url' ), $buffer
-			);
-		}
+    ImageKitHelper::log_debug("IK_REGEXPS", $this->_regexps);
 
-		// @TODO: Remove Placeholders as they are unessential
-		$buffer = $this->replace_placeholders( $buffer );
-        
-		$buffer = ImageKitHelper::print_debug_logs($buffer);
+    $srcset_pattern = '~srcset\s*=\s*[\"\'](.*?)[\"\']~';
+    $buffer = preg_replace_callback($srcset_pattern, array(
+      $this,
+      '_srcset_replace_callback'
+    ) , $buffer);
 
-		return $buffer;
-	} 
+    foreach ($this->_regexps as $regexp) {
+      $buffer = preg_replace_callback($regexp, array(
+        $this,
+        'rewrite_url'
+      ) , $buffer);
+    }
 
-	private function replace_placeholders( $buffer ) {
-		foreach ( $this->_placeholders as $srcset_id => $srcset_content ) {
-			$buffer = str_replace( $srcset_id, $srcset_content, $buffer );
-		}
-		return $buffer;
-	}
+    // @TODO: Remove Placeholders as they are unessential
+    $buffer = $this->replace_placeholders($buffer);
 
-	function _srcset_replace_callback( $matches ) {
-		list( $match, $srcset ) = $matches;
-		if ( empty( $this->_regexps ) )
-			return $match;
-		$index = "%srcset-" . count( $this->_placeholders ) . "%";
+    $buffer = ImageKitHelper::print_debug_logs($buffer);
 
-		$srcset_urls = explode( ',', $srcset );
-		$new_srcset_urls = array();
+    return $buffer;
+  }
 
-		foreach ( $srcset_urls as $set ) {
+  private function replace_placeholders($buffer) {
+    foreach ($this->_placeholders as $srcset_id => $srcset_content) {
+      $buffer = str_replace($srcset_id, $srcset_content, $buffer);
+    }
+    return $buffer;
+  }
 
-			preg_match( "~(?P<spaces>^\s*)(?P<url>\S+)(?P<rest>.*)~", $set, $parts );
-			if ( isset( $parts['url'] ) ) {
+  function _srcset_replace_callback($matches) {
+    list($match, $srcset) = $matches;
+    if (empty($this->_regexps)) return $match;
+    $index = "%srcset-" . count($this->_placeholders) . "%";
 
-				foreach ( $this->_regexps as $regexp ) {
-					$new_url = preg_replace_callback( $regexp, array(
-							$this,
-							'rewrite_url'
-						), '"' . $parts['url'] . '">' );
+    $srcset_urls = explode(',', $srcset);
+    $new_srcset_urls = array();
 
-					if ( '"' . $parts['url'] . '">' != $new_url ) {
-						$parts['url'] = substr( $new_url, 1, -2 );
-						break;
-					}
-				}
-				$new_srcset_urls[] = $parts['spaces'] .$parts['url']
-					. $parts['rest'];
-			} else {
-				$new_srcset_urls[] = $set;
-			}
+    foreach ($srcset_urls as $set) {
 
-		}
-		$this->_placeholders[$index] = implode( ',', $new_srcset_urls );
-		return 'srcset="' . $index . '"';
-	}
+      preg_match("~(?P<spaces>^\s*)(?P<url>\S+)(?P<rest>.*)~", $set, $parts);
+      if (isset($parts['url'])) {
 
-	private function fill_regexps() {
-		$regexps = array();
+        foreach ($this->_regexps as $regexp) {
+          $new_url = preg_replace_callback($regexp, array(
+            $this,
+            'rewrite_url'
+          ) , '"' . $parts['url'] . '">');
 
-		$site_path = ImageKitHelper::site_url_uri();
-		$domain_url_regexp = ImageKitHelper::home_domain_root_url_regexp();
+          if ('"' . $parts['url'] . '">' != $new_url) {
+            $parts['url'] = substr($new_url, 1, -2);
+            break;
+          }
+        }
+        $new_srcset_urls[] = $parts['spaces'] . $parts['url'] . $parts['rest'];
+      }
+      else {
+        $new_srcset_urls[] = $set;
+      }
 
-		$site_domain_url_regexp = false;
-		if ( $domain_url_regexp != ImageKitHelper::get_url_regexp(
-			ImageKitHelper::url_to_host( site_url() ) ) )
-			$site_domain_url_regexp = ImageKitHelper::get_url_regexp(
-				ImageKitHelper::url_to_host( site_url() )
-			);
+    }
+    $this->_placeholders[$index] = implode(',', $new_srcset_urls);
+    return 'srcset="' . $index . '"';
+  }
 
-		// regex for allowed file types
-		$mask = $this->imagekit_options['file_type'];
-		if ( $mask != '' ) {
-			$regexps[] = '~(["\'(=])\s*((' . $domain_url_regexp .
-				')?(' .
-				ImageKitHelper::preg_quote( $site_path . WPINC ) .
-				'/(' . ImageKitHelper::get_regexp_by_mask( $mask ) . ')([^"\'() >]*)))~i';
-			if ( $site_domain_url_regexp )
-				$regexps[] = '~(["\'(=])\s*((' .
-					$site_domain_url_regexp . ')?(' .
-					ImageKitHelper::preg_quote( $site_path . WPINC ) .
-					'/(' . ImageKitHelper::get_regexp_by_mask( $mask ) .
-					')([^"\'() >]*)))~i';
+  private function fill_regexps() {
+    $regexps = array();
 
-			// allow same file formats for themes
-			$theme_dir = preg_replace( '~'
-			. $domain_url_regexp . '~i', '', get_theme_root_uri() );
-			$regexps[] = '~(["\'(=])\s*((' . $domain_url_regexp . ')?(' .
-				ImageKitHelper::preg_quote( $theme_dir ) . '/(' .
-				ImageKitHelper::get_regexp_by_mask( $mask ) . ')([^"\'() >]*)))~i';
+    $site_path = ImageKitHelper::site_url_uri();
+    $domain_url_regexp = ImageKitHelper::home_domain_root_url_regexp();
 
-			if ( $site_domain_url_regexp ) {
-				$theme_dir2 = preg_replace( '~' . $site_domain_url_regexp
-					. '~i', '', get_theme_root_uri() );
-				$regexps[] = '~(["\'(=])\s*((' .
-					$site_domain_url_regexp . ')?(' .
-					ImageKitHelper::preg_quote( $theme_dir ) . '/(' .
-					ImageKitHelper::get_regexp_by_mask( $mask ) .
-					')([^"\'() >]*)))~i';
-				$regexps[] = '~(["\'(=])\s*((' .
-					$site_domain_url_regexp . ')?(' .
-					ImageKitHelper::preg_quote( $theme_dir2 ) .
-					'/(' . ImageKitHelper::get_regexp_by_mask( $mask ) .
-					')([^"\'() >]*)))~i';
-			}
+    $site_domain_url_regexp = false;
+    if ($domain_url_regexp != ImageKitHelper::get_url_regexp(ImageKitHelper::url_to_host(site_url()))) $site_domain_url_regexp = ImageKitHelper::get_url_regexp(ImageKitHelper::url_to_host(site_url()));
 
-			// allow same file formats for uploads
-			$upload_info = ImageKitHelper::upload_info();
-			$upload_dir = $upload_info["baseurlpath"];
-			$regexps[] = '~(["\'(=])\s*((' . $domain_url_regexp . ')?(' .
-				ImageKitHelper::preg_quote( $upload_dir ) . '(' .
-				ImageKitHelper::get_regexp_by_mask( $mask ) . ')([^"\'() >]*)))~i';
+    // regex for allowed file types
+    $mask = $this->imagekit_options['file_type'];
+    if ($mask != '') {
+      $regexps[] = '~(["\'(=])\s*((' . $domain_url_regexp . ')?(' . ImageKitHelper::preg_quote($site_path . WPINC) . '/(' . ImageKitHelper::get_regexp_by_mask($mask) . ')([^"\'() >]*)))~i';
+      if ($site_domain_url_regexp) $regexps[] = '~(["\'(=])\s*((' . $site_domain_url_regexp . ')?(' . ImageKitHelper::preg_quote($site_path . WPINC) . '/(' . ImageKitHelper::get_regexp_by_mask($mask) . ')([^"\'() >]*)))~i';
 
-			if ( $site_domain_url_regexp ) {
-				$regexps[] = '~(["\'(=])\s*((' .
-					$site_domain_url_regexp . ')?(' .
-					ImageKitHelper::preg_quote( $upload_dir ) . '(' .
-					ImageKitHelper::get_regexp_by_mask( $mask ) .
-					')([^"\'() >]*)))~i';
-				$regexps[] = '~(["\'(=])\s*((' .
-					$site_domain_url_regexp . ')?(' .
-					ImageKitHelper::preg_quote( $upload_dir ) .
-					'(' . ImageKitHelper::get_regexp_by_mask( $mask ) .
-					')([^"\'() >]*)))~i';
-			}
-		}
-		
-		$masks = explode(PHP_EOL,$this->imagekit_options['custom_files']);
+      // allow same file formats for themes
+      $theme_dir = preg_replace('~' . $domain_url_regexp . '~i', '', get_theme_root_uri());
+      $regexps[] = '~(["\'(=])\s*((' . $domain_url_regexp . ')?(' . ImageKitHelper::preg_quote($theme_dir) . '/(' . ImageKitHelper::get_regexp_by_mask($mask) . ')([^"\'() >]*)))~i';
 
-		if ( count( $masks ) ) {
-			$custom_regexps_urls = array();
-			$custom_regexps_uris = array();
-			$custom_regexps_docroot_related = array();
+      if ($site_domain_url_regexp) {
+        $theme_dir2 = preg_replace('~' . $site_domain_url_regexp . '~i', '', get_theme_root_uri());
+        $regexps[] = '~(["\'(=])\s*((' . $site_domain_url_regexp . ')?(' . ImageKitHelper::preg_quote($theme_dir) . '/(' . ImageKitHelper::get_regexp_by_mask($mask) . ')([^"\'() >]*)))~i';
+        $regexps[] = '~(["\'(=])\s*((' . $site_domain_url_regexp . ')?(' . ImageKitHelper::preg_quote($theme_dir2) . '/(' . ImageKitHelper::get_regexp_by_mask($mask) . ')([^"\'() >]*)))~i';
+      }
 
-			foreach ( $masks as $mask ) {
-				if ( !empty( $mask ) ) {
-					if ( ImageKitHelper::is_url( $mask ) ) {
-						$url_match = array();
-						if ( preg_match( '~^((https?:)?//([^/]*))(.*)~', $mask, $url_match ) ) {
-							$custom_regexps_urls[] = array(
-								'domain_url' => ImageKitHelper::get_url_regexp(
-									$url_match[1] ),
-								'uri' => ImageKitHelper::get_regexp_by_mask( $url_match[4] )
-							);
-						}
-					} elseif ( substr( $mask, 0, 1 ) == '/' ) {   // uri
-						$custom_regexps_uris[] = ImageKitHelper::get_regexp_by_mask( $mask );
-					} else {
-						$file = ImageKitHelper::normalize_path( $mask );   // \ -> backspaces
-						$file = str_replace( ImageKitHelper::site_root(), '', $file );
-						$file = ltrim( $file, '/' );
+      // allow same file formats for uploads
+      $upload_info = ImageKitHelper::upload_info();
+      $upload_dir = $upload_info["baseurlpath"];
+      $regexps[] = '~(["\'(=])\s*((' . $domain_url_regexp . ')?(' . ImageKitHelper::preg_quote($upload_dir) . '(' . ImageKitHelper::get_regexp_by_mask($mask) . ')([^"\'() >]*)))~i';
 
-						$custom_regexps_docroot_related[] = ImageKitHelper::get_regexp_by_mask( $mask );
-					}
-				}
-			}
+      if ($site_domain_url_regexp) {
+        $regexps[] = '~(["\'(=])\s*((' . $site_domain_url_regexp . ')?(' . ImageKitHelper::preg_quote($upload_dir) . '(' . ImageKitHelper::get_regexp_by_mask($mask) . ')([^"\'() >]*)))~i';
+        $regexps[] = '~(["\'(=])\s*((' . $site_domain_url_regexp . ')?(' . ImageKitHelper::preg_quote($upload_dir) . '(' . ImageKitHelper::get_regexp_by_mask($mask) . ')([^"\'() >]*)))~i';
+      }
+    }
 
-			if ( count( $custom_regexps_urls ) > 0 ) {
-				foreach ( $custom_regexps_urls as $regexp ) {
-					$regexps[] = '~(["\'(=])\s*((' . $regexp['domain_url'] .
-					')?((' . $regexp['uri'] . ')([^"\'() >]*)))~i';
-				}
-			}
-			if ( count( $custom_regexps_uris ) > 0 ) {
-				$regexps[] = '~(["\'(=])\s*((' . $domain_url_regexp .
-					')?((' . implode( '|', $custom_regexps_uris ) . ')([^"\'() >]*)))~i';
-			}
+    $masks = explode(PHP_EOL, $this->imagekit_options['custom_files']);
 
-			if ( count( $custom_regexps_docroot_related ) > 0 ) {
-				$regexps[] = '~(["\'(=])\s*((' . $domain_url_regexp .
-					')?(' . ImageKitHelper::preg_quote( $site_path ) .
-					'(' . implode( '|', $custom_regexps_docroot_related ) . ')([^"\'() >]*)))~i';
-				if ( $site_domain_url_regexp )
-					$regexps[] = '~(["\'(=])\s*((' .
-						$site_domain_url_regexp . ')?(' .
-						ImageKitHelper::preg_quote( $site_path ) . '(' .
-						implode( '|', $custom_regexps_docroot_related ) . ')([^"\'() >]*)))~i';
-			}
-		}
+    if (count($masks)) {
+      $custom_regexps_urls = array();
+      $custom_regexps_uris = array();
+      $custom_regexps_docroot_related = array();
 
-		$this->_regexps = $regexps;
-	}
+      foreach ($masks as $mask) {
+        if (!empty($mask)) {
+          if (ImageKitHelper::is_url($mask)) {
+            $url_match = array();
+            if (preg_match('~^((https?:)?//([^/]*))(.*)~', $mask, $url_match)) {
+              $custom_regexps_urls[] = array(
+                'domain_url' => ImageKitHelper::get_url_regexp($url_match[1]) ,
+                'uri' => ImageKitHelper::get_regexp_by_mask($url_match[4])
+              );
+            }
+          }
+          elseif (substr($mask, 0, 1) == '/') { // uri
+            $custom_regexps_uris[] = ImageKitHelper::get_regexp_by_mask($mask);
+          }
+          else {
+            $file = ImageKitHelper::normalize_path($mask); // \ -> backspaces
+            $file = str_replace(ImageKitHelper::site_root() , '', $file);
+            $file = ltrim($file, '/');
+
+            $custom_regexps_docroot_related[] = ImageKitHelper::get_regexp_by_mask($mask);
+          }
+        }
+      }
+
+      if (count($custom_regexps_urls) > 0) {
+        foreach ($custom_regexps_urls as $regexp) {
+          $regexps[] = '~(["\'(=])\s*((' . $regexp['domain_url'] . ')?((' . $regexp['uri'] . ')([^"\'() >]*)))~i';
+        }
+      }
+      if (count($custom_regexps_uris) > 0) {
+        $regexps[] = '~(["\'(=])\s*((' . $domain_url_regexp . ')?((' . implode('|', $custom_regexps_uris) . ')([^"\'() >]*)))~i';
+      }
+
+      if (count($custom_regexps_docroot_related) > 0) {
+        $regexps[] = '~(["\'(=])\s*((' . $domain_url_regexp . ')?(' . ImageKitHelper::preg_quote($site_path) . '(' . implode('|', $custom_regexps_docroot_related) . ')([^"\'() >]*)))~i';
+        if ($site_domain_url_regexp) $regexps[] = '~(["\'(=])\s*((' . $site_domain_url_regexp . ')?(' . ImageKitHelper::preg_quote($site_path) . '(' . implode('|', $custom_regexps_docroot_related) . ')([^"\'() >]*)))~i';
+      }
+    }
+
+    $this->_regexps = $regexps;
+  }
 
 }
+
