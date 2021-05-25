@@ -23,11 +23,11 @@ if( ! defined( 'IK_PLUGIN_ENTRYPOINT' ) ){
 	define('IK_PLUGIN_ENTRYPOINT', __FILE__);
 }
 
+if ( !defined(('IK_DEBUG')) ) {
+	define('IK_DEBUG', FALSE);
+}
+
 add_action( 'template_redirect', function() {
-	// Don't run if SCRIPT_DEBUG is set to true
-	if( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
-		return;
-	}
 
 	global $imagekit_options;
 

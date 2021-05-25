@@ -8,14 +8,7 @@ class ImageKitReWriter {
 
 	private $_regexps = array();
 	private $_placeholders = array();
-	private $_config;
-	private $_replaced_urls;
 	private $imagekit_options;
-
-	/**
-	 * @var array
-	 */
-	private $excludes = array(".js",".css");
 
 	/**
 	 * @var string
@@ -39,6 +32,7 @@ class ImageKitReWriter {
 		$imagekit_options["reject_files"] = !empty($imagekit_options["reject_files"]) ? $imagekit_options["reject_files"] : "wp-content/uploads/wpcf7_captcha/*\nwp-content/uploads/imagerotator.swf\ncustom-directory*.mp4";
 
 		$this->imagekit_options = $imagekit_options;
+		ImageKitHelper::log_debug("Rewriter Options", array("site_url" => $site_url, "cdn_url" => $cdn_url, "options" => $imagekit_options));
 	}
 
 	protected function exclude_asset($path) {
@@ -109,6 +103,7 @@ class ImageKitReWriter {
 		$path = ltrim( $path, '/' );
 		
 		if ($this->exclude_asset($path)) {
+			ImageKitHelper::log_debug("Exluded Rewriting", $path);
 			return $quote . $url;
 		}
 		$site_url = $this->site_url;
@@ -135,11 +130,15 @@ class ImageKitReWriter {
 			$final_url = $this->cdn_url . $path;
 		}
 
+		ImageKitHelper::log_debug("Rewriting", $path." => ".$final_url);
+
 		return $quote . $final_url;
 	}
 
 	public function replace_all_links( $buffer ) {
 		$this->fill_regexps();
+
+		ImageKitHelper::log_debug("IK_REGEXPS", $this->_regexps);
 
 		$srcset_pattern = '~srcset\s*=\s*[\"\'](.*?)[\"\']~';
 		$buffer = preg_replace_callback(
@@ -152,8 +151,11 @@ class ImageKitReWriter {
 			);
 		}
 
+		// @TODO: Remove Placeholders as they are unessential
 		$buffer = $this->replace_placeholders( $buffer );
         
+		$buffer = ImageKitHelper::print_debug_logs($buffer);
+
 		return $buffer;
 	} 
 
@@ -326,35 +328,4 @@ class ImageKitReWriter {
 		$this->_regexps = $regexps;
 	}
 
-	/**
-	 *
-	 *
-	 * @param unknown $domain_url_regexp
-	 * @param unknown $baseurl
-	 * @param unknown $upload_info
-	 * @param unknown $regexps
-	 * @return array
-	 */
-	 private function make_uploads_regexes( $domain_url_regexp, $baseurl,
-	 $upload_info, $regexps ) {
-	 if ( preg_match( '~' . $domain_url_regexp . '~i', $baseurl ) ) {
-		 $regexps[] = '~(["\'(=])\s*((' . $domain_url_regexp . ')?('
-			 . ImageKitHelper::preg_quote( $upload_info['baseurlpath'] )
-			 . '([^"\')>]+)))~i';
-	 } else {
-		 $parsed = @parse_url( $baseurl );
-		 $upload_url_domain_regexp = isset( $parsed['host'] )
-			 ? ImageKitHelper::get_url_regexp( $parsed['scheme'] . '://'
-			 . $parsed['host'] ) : $domain_url_regexp;
-		 $baseurlpath = isset( $parsed['path'] ) ? rtrim( $parsed['path'], '/' ) : '';
-		 if ( $baseurlpath )
-			 $regexps[] = '~(["\'])\s*((' . $upload_url_domain_regexp . ')?('
-				 . ImageKitHelper::preg_quote( $baseurlpath )
-				 . '([^"\'>]+)))~i';
-		 else
-			 $regexps[] = '~(["\'])\s*((' . $upload_url_domain_regexp
-				 . ')(([^"\'>]+)))~i';
-	 }
-	 return $regexps;
- }
 }

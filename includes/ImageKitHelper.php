@@ -1,6 +1,8 @@
 <?php
 
 class ImageKitHelper {
+	static $debug_logs = array();
+
 	/**
 	 * Formats URL
 	 *
@@ -1550,6 +1552,24 @@ class ImageKitHelper {
 	}
 
 	static function get_array( $key, $default = array() ) {
-		return (array)$this->get( $key, $default );
+		return (array)ImageKitHelper::get( $key, $default );
+	}
+
+	static function log_debug($event, $content) {
+		if (defined('IK_DEBUG') && IK_DEBUG == TRUE) {
+
+				if (!array_key_exists($event, ImageKitHelper::$debug_logs)) {
+						ImageKitHelper::$debug_logs[$event] = array();
+				}
+
+				array_push(ImageKitHelper::$debug_logs[$event], $content);
+		}   
+	}
+
+	static function print_debug_logs($buffer) {
+			$buffer = $buffer."<!--";
+			$buffer = $buffer.print_r(ImageKitHelper::$debug_logs, TRUE);
+			$buffer = $buffer."-->";
+			return $buffer;
 	}
 }
