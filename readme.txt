@@ -92,35 +92,38 @@ This is because image dimensions are not as per the layout. We could have done i
 
 == Changelog ==
 
-2.0.6
-Added CNAME support
+4.1.1
+Bug Fixes and tested on Wordpress 5.7.2
 
-2.0.7
-Stopped transforming image urls to use ImageKit's resizing transformations.
-
-3.0.0
-Added and updated documentation links. Simplified the integration steps.
-
-3.0.1
-A bug fix for checking value of imagekit_id
-
-3.0.2
-Bug fix
-
-3.0.4
-Updated readme
-
-3.0.5
-Modified the Registration message on settings page
-
-4.0.0
-Bug Fixes and Added Lazy Load support
+4.1.0
+Bug Fixes. Tested for PHP 8 and Wordpress 5.6
 
 4.0.1
 Bug Fixes and Lazy Load Update
 
-4.1.0
-Bug Fixes. Tested for PHP 8 and Wordpress 5.6
+4.0.0
+Bug Fixes and Added Lazy Load support
+
+3.0.5
+Modified the Registration message on settings page
+
+3.0.4
+Updated readme
+
+3.0.2
+Bug fix
+
+3.0.1
+A bug fix for checking value of imagekit_id
+
+3.0.0
+Added and updated documentation links. Simplified the integration steps.
+
+2.0.7
+Stopped transforming image urls to use ImageKit's resizing transformations.
+
+2.0.6
+Added CNAME support
 
 == Upgrade notice ==
 
