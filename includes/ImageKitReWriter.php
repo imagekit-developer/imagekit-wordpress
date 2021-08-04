@@ -168,7 +168,9 @@ class ImageKitReWriter {
     // @TODO: Remove Placeholders as they are unessential
     $buffer = $this->replace_placeholders($buffer);
 
-    $buffer = ImageKitHelper::print_debug_logs($buffer);
+    if (defined('IK_DEBUG') && IK_DEBUG == true) {
+      $buffer = ImageKitHelper::print_debug_logs($buffer);
+    }
 
     return $buffer;
   }
