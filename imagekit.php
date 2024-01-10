@@ -4,7 +4,7 @@ Plugin Name: ImageKit
 Description: A WordPress plugin to automatically fetch your WordPress images via <a href="https://www.imagekit.io" target="_blank">ImageKit</a> for optimization and super fast delivery. <a href="https://imagekit.io/blog/how-to-optimize-images-on-wordpress-website-using-imagekit/" target="_blank">Learn more</a> from documentation.
 Author: ImageKit
 Author URI: https://imagekit.io
-Version: 4.1.2
+Version: 4.1.3
 */
 
 // Variables

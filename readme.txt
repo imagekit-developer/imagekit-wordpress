@@ -4,7 +4,7 @@ Donate link:
 Tags: images,image management, image manipulation, image optimization, image optimisation,imagekit, wepb,photo, photos, picture, pictures, thumbnail, thumbnails, upload, batch, cdn, content delivery network
 Requires at least: 3.3
 Tested up to: 6.4.2
-Stable tag: 4.1.2
+Stable tag: 4.1.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -91,6 +91,9 @@ This is because image dimensions are not as per the layout. We could have done i
 1
 
 == Changelog ==
+
+4.1.3
+Tested on Wordpress 6.4.2
 
 4.1.2
 Bug Fixes
