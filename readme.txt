@@ -2,9 +2,10 @@
 Contributors: imagekit
 Donate link: 
 Tags: images,image management, image manipulation, image optimization, image optimisation,imagekit, wepb,photo, photos, picture, pictures, thumbnail, thumbnails, upload, batch, cdn, content delivery network
-Requires at least: 3.3
-Tested up to: 6.4.2
-Stable tag: 4.1.3
+Requires at least: 4.7
+Tested up to: 6.8.3
+Requires PHP: 5.6
+Stable tag: STABLETAG
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 

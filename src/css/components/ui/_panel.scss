@@ -1,0 +1,139 @@
+&-panel {
+    background-color: #fff;
+    border: 1px solid $color-ik-grey-blue;
+
+    h4 {
+        margin: 1em 0;
+        margin-top: 0;
+    }
+
+    &.full-width {
+        max-width: 100%;
+    }
+
+    margin-top: 13px;
+    padding: $size-padding-panel;
+
+    &.has-heading {
+        margin-top: 0;
+        border-top: 0;
+    }
+
+    &-heading {
+        display: flex;
+        padding: $size-padding-panel-title;
+        position: relative;
+        justify-content: space-between;
+
+        &.full-width {
+            max-width: 100%;
+        }
+
+        img {
+            margin-right: 0.6rem;
+        }
+
+        &.collapsible {
+            cursor: pointer;
+            padding-right: 1rem;
+        }
+    }
+
+    &-inner {
+        padding: 1.3rem;
+        margin: 1em 0;
+        background-color: rgba(220, 220, 220, 0.2);
+        border: 1px solid $color-light-grey;
+
+        h2 {
+            color: $color-wp-blue;
+        }
+    }
+
+    .help-wrap {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        flex-grow: 1;
+        align-items: stretch;
+
+        @media only screen and (max-width: $size-small) {
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .help-box {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            padding: 20px 20px 18px;
+            background: #ffffff;
+            border-radius: 12px;
+            min-height: 175px;
+
+            box-shadow:
+                0 1px 2px rgba(16, 24, 40, 0.06),
+                0 4px 12px rgba(16, 24, 40, 0.08);
+            transition:
+                box-shadow 0.2s ease,
+                transform 0.2s ease;
+
+
+            a {
+                text-decoration: none;
+            }
+
+            &:hover,
+            &:focus-visible {
+                box-shadow:
+                    0 4px 8px rgba(16, 24, 40, 0.10),
+                    0 12px 24px rgba(16, 24, 40, 0.12);
+            }
+
+            &-header {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin-bottom: 10px;
+
+                &-icon {
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 10px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: #eef4ff;
+                    color: #1f5eff;
+                    font-size: 20px;
+                }
+
+                /* Title */
+                &-title {
+                    margin: 0;
+                    font-size: 16px;
+                    font-weight: 600;
+                    color: #101828;
+                }
+            }
+
+
+
+            &-description {
+                margin: 0;
+                font-size: 14px;
+                line-height: 1.5;
+                color: #475467;
+            }
+
+
+        }
+    }
+
+
+	hr {
+		border-top: 1px solid $color-light-grey;
+		margin: 19px 0 20px;
+		clear: both;
+	}
+}

@@ -1,0 +1,48 @@
+{
+    "name": "imagekit/imagekit-wordpress",
+    "type": "wordpress-plugin",
+    "license": "GPLv2",
+    "authors": [
+        {
+            "name": "ImageKit Developer",
+            "email": "developer@imagekit.io",
+            "homepage": "https://imagekit.io",
+            "role": "Developer"
+        },
+        {
+            "name": "Abhinav Dhiman",
+            "email": "abhinav@imagekit.io",
+            "homepage": "https://imagekit.io",
+            "role": "Developer"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "ext-json": "*"
+    },
+    "require-dev": {
+        "wp-coding-standards/wpcs": "3.3.0",
+        "phpcompatibility/phpcompatibility-wp": "dev-master",
+        "phpcompatibility/php-compatibility": "10.0.0-alpha2",
+        "dealerdirect/phpcodesniffer-composer-installer": "1.2.0"
+    },
+    "config": {
+        "platform": {
+            "php": "8.4.11"
+        },
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    },
+    "scripts": {
+        "lint": [
+            "phpcs"
+        ],
+        "fix": [
+            "phpcbf"
+        ],
+        "make-pot": [
+            "wp i18n make-pot . languages/imagekit.pot"
+        ]
+    }
+}
