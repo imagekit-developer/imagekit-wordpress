@@ -244,4 +244,35 @@ class Utils {
 
 		return is_array( $pathinfo ) ? array_map( 'urldecode', $pathinfo ) : urldecode( $pathinfo );
 	}
+
+
+	/**
+	 * Check if we are in WordPress ajax.
+	 *
+	 * @return bool
+	 */
+	public static function is_frontend_ajax() {
+		$referer    = wp_get_referer();
+		$admin_base = admin_url();
+		$is_admin   = $referer ? 0 === strpos( $referer, $admin_base ) : false;
+		// Check if this is a frontend ajax request.
+		$is_frontend_ajax = ! $is_admin && defined( 'DOING_AJAX' ) && DOING_AJAX;
+		// If it's not an obvious WP ajax request, check if it's a custom frontend ajax request.
+		if ( ! $is_frontend_ajax && ! $is_admin ) {
+			// Catch the content type of the $_SERVER['CONTENT_TYPE'] variable.
+			$type             = filter_input( INPUT_SERVER, 'CONTENT_TYPE', FILTER_CALLBACK, array( 'options' => 'sanitize_text_field' ) );
+			$is_frontend_ajax = $type && false !== strpos( $type, 'json' );
+		}
+
+		return $is_frontend_ajax;
+	}
+
+	/**
+	 * Check if this is an admin request, but not an ajax one.
+	 *
+	 * @return bool
+	 */
+	public static function is_admin() {
+		return is_admin() && ! self::is_frontend_ajax();
+	}
 }

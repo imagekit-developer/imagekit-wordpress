@@ -293,7 +293,7 @@ final class Plugin {
 
 		array_map(
 			function ( $component ) {
-				$component->register_enqueue_styles();
+				$component->enqueue_assets();
 			},
 			$components
 		);

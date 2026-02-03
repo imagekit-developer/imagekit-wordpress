@@ -93,7 +93,58 @@ if (wp.media) {
 								nonce: IKML.nonce,
 								asset,
 							}).done((asset) => {
+								const updateAsset = function (newAsset, attach) {
+									newAsset.uploading = false;
+									attach.set(newAsset);
+									wp.Uploader.queue.remove(attach);
+									if (wp.Uploader.queue.length === 0) {
+										wp.Uploader.queue.reset();
+									}
+								};
 
+
+								if (typeof asset.fetch !== 'undefined') {
+									const attach = attachment.get(asset.attachment_id);
+									attach.set(asset);
+									library.add(attach);
+									wp.Uploader.queue.add(attach);
+									wp.ajax
+										.send({
+											url: asset.fetch,
+											beforeSend(request) {
+												request.setRequestHeader('X-WP-Nonce', IKML.nonce);
+											},
+											data: {
+												src: asset.url,
+												filename: asset.filename,
+												attachment_id: asset.attachment_id,
+												transformations: asset.transformations,
+											},
+										})
+										.done(function (newAsset) {
+											const att = attachment.get(newAsset.id);
+											updateAsset(newAsset, att);
+										})
+										.fail(function (err) {
+											updateAsset(asset, attach);
+											library.remove(attach);
+											selection.remove(attach);
+
+											if (typeof err === 'string') {
+												alert(err);
+											} else if (err.status === 500) {
+												alert('HTTP error.');
+											}
+										});
+								} else {
+									const attach = attachment.get(asset.id);
+									attach.set(asset);
+									selection.add(attach);
+								}
+								if (wp.Uploader.queue.length === 0) {
+									wp.Uploader.queue.reset();
+								}
+								controller.content.mode('browse');
 							})
 						}
 					}

@@ -18,6 +18,20 @@ $data = array(
 	'saveNonce' => wp_create_nonce( 'wp_rest' ),
 );
 
+$credentials = array();
+if ( $imagekit && method_exists( $imagekit, 'get_component' ) ) {
+	$manager = $imagekit->get_component( 'credentials_manager' );
+	if ( $manager && method_exists( $manager, 'get_credentials' ) ) {
+		$credentials = (array) $manager->get_credentials();
+	}
+}
+
+$data['prefill'] = array(
+	'urlEndpoint' => ! empty( $credentials['url_endpoint'] ) ? (string) $credentials['url_endpoint'] : '',
+	'publicKey'   => ! empty( $credentials['public_key'] ) ? (string) $credentials['public_key'] : '',
+	'privateKey'  => ! empty( $credentials['private_key'] ) ? (string) $credentials['private_key'] : '',
+);
+
 $imagekit->add_script_data( 'wizard', $data );
 
 ?>
