@@ -5196,11 +5196,59 @@ class Wizard {
     this._ensureNonceMiddleware(data);
     const payload = this._getWizardPayload();
 
-    return await (0,_wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_0__["default"])({
-      url: data.testURL,
-      method: "POST",
-      data: payload,
-    });
+    try {
+      return await (0,_wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_0__["default"])({
+        url: data.testURL,
+        method: "POST",
+        data: payload,
+      });
+    } catch (err) {
+      const errData =
+        err && err.data && typeof err.data === "object" ? err.data : null;
+
+      const errPayload =
+        errData && errData.data && typeof errData.data === "object" ? errData.data : null;
+
+      let code = "connection_error";
+      if (errData && errData.code) {
+        code = errData.code;
+      } else if (errPayload && errPayload.code) {
+        code = errPayload.code;
+      } else if (err && err.code) {
+        code = err.code;
+      }
+
+      let message = "Unable to verify connection. Please try again.";
+      if (errData && errData.message) {
+        message = errData.message;
+      } else if (errPayload && errPayload.message) {
+        message = errPayload.message;
+      } else if (err && err.message) {
+        message = err.message;
+      }
+
+      let fieldErrors = {};
+      if (
+        errData &&
+        errData.fieldErrors &&
+        typeof errData.fieldErrors === "object"
+      ) {
+        fieldErrors = errData.fieldErrors;
+      } else if (
+        errPayload &&
+        errPayload.fieldErrors &&
+        typeof errPayload.fieldErrors === "object"
+      ) {
+        fieldErrors = errPayload.fieldErrors;
+      }
+
+      return {
+        ok: false,
+        code,
+        message,
+        fieldErrors,
+      };
+    }
   }
 
   async _saveWizardAndContinue() {

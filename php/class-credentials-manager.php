@@ -121,8 +121,39 @@ class Credentials_Manager extends Settings_Component implements Config, Setup {
 		$private_key  = $request->get_param( 'privateKey' );
 
 		$result = $this->test_connection( $url_endpoint, $public_key, $private_key );
+		if ( ! empty( $result['ok'] ) ) {
+			return rest_ensure_response( $result );
+		}
 
-		return rest_ensure_response( $result );
+		$status = 500;
+		$code   = ! empty( $result['code'] ) ? (string) $result['code'] : 'connection_error';
+		if ( str_starts_with( $code, 'invalid_' ) ) {
+			$status = 400;
+		} elseif ( 'auth_failed' === $code ) {
+			$status = 401;
+		} elseif ( in_array( $code, array( 'forbidden', 'account_disabled' ), true ) ) {
+			$status = 403;
+		} elseif ( 'rate_limited' === $code ) {
+			$status = 429;
+		} elseif ( in_array( $code, array( 'network_error', 'upstream_error' ), true ) ) {
+			$status = 502;
+		}
+
+		$message = ! empty( $result['message'] ) ? (string) $result['message'] : __( 'Unable to verify connection.', 'imagekit' );
+		$result['message'] = $message;
+
+		$error = new \WP_Error(
+			$code,
+			$message,
+			array_merge(
+				array(
+					'status' => $status,
+				),
+				$result
+			)
+		);
+
+		return rest_convert_error_to_response( $error );
 	}
 
 
@@ -271,12 +302,45 @@ class Credentials_Manager extends Settings_Component implements Config, Setup {
 		$test_result = $this->check_status();
 
 		if ( is_wp_error( $test_result ) ) {
-			$error        = $test_result->get_error_message();
-			$result['ok'] = false;
-			if ( 'your account is disabled' !== strtolower( $error ) ) {
+			$error_code    = $test_result->get_error_code();
+			$error_message = $test_result->get_error_message();
+			$result['ok']  = false;
+			$result['message'] = $error_message;
+
+			$normalized_message = strtolower( trim( (string) $error_message ) );
+			if ( 'your account is disabled' === $normalized_message ) {
+				$result['code'] = 'account_disabled';
+			} elseif ( str_contains( $normalized_message, 'cannot be authenticated' ) || str_contains( $normalized_message, 'unauthorized' ) || str_contains( $normalized_message, 'not authorized' ) ) {
+				$result['code'] = 'auth_failed';
+			} elseif ( str_contains( $normalized_message, 'forbidden' ) ) {
+				$result['code'] = 'forbidden';
+			} elseif ( str_contains( $normalized_message, 'rate limit' ) || str_contains( $normalized_message, 'too many request' ) ) {
+				$result['code'] = 'rate_limited';
+			} elseif ( str_contains( $normalized_message, 'timed out' ) || str_contains( $normalized_message, 'timeout' ) ) {
+				$result['code'] = 'network_error';
+			} elseif ( is_numeric( $error_code ) ) {
+				switch ( (int) $error_code ) {
+					case 401:
+						$result['code'] = 'auth_failed';
+						break;
+					case 403:
+						$result['code'] = 'forbidden';
+						break;
+					case 429:
+						$result['code'] = 'rate_limited';
+						break;
+					default:
+						if ( (int) $error_code >= 500 ) {
+							$result['code'] = 'upstream_error';
+						} else {
+							$result['code'] = 'connection_error';
+						}
+				}
+			} elseif ( 'http_request_failed' === (string) $error_code ) {
+				$result['code'] = 'network_error';
+			} else {
 				$result['code'] = 'connection_error';
 			}
-			$result['message'] = $test_result->get_error_message();
 		} else {
 			$this->usage_stats( true );
 		}

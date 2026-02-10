@@ -59,29 +59,33 @@ $settings = array(
 						),
 					),
 					array(
-						'type'        => 'input',
-						'slug'        => 'max_width',
-						'title'       => __( 'Image width limit', 'imagekit' ),
-						'extra_title' => __(
-							'The minimum and maximum width of an image created as a breakpoint. Leave “max” as empty to automatically detect based on the largest registered size in WordPress.',
-							'imagekit'
+						'type'  => 'row',
+						'align' => 'end',
+						array(
+							'type'        => 'input',
+							'slug'        => 'max_width',
+							'title'       => __( 'Image width limit', 'imagekit' ),
+							'extra_title' => __(
+								'The minimum and maximum width of an image created as a breakpoint. Leave "max" as empty to automatically detect based on the largest registered size in WordPress.',
+								'imagekit'
+							),
+							'prefix'      => __( 'Max', 'imagekit' ),
+							'suffix'      => __( 'px', 'imagekit' ),
+							'attributes'  => array(
+								'type' => 'number',
+								'step' => 50,
+							),
 						),
-						'prefix'      => __( 'Max', 'imagekit' ),
-						'suffix'      => __( 'px', 'imagekit' ),
-						'attributes'  => array(
-							'type' => 'number',
-							'step' => 50,
-						),
-					),
-					array(
-						'type'       => 'input',
-						'slug'       => 'min_width',
-						'prefix'     => __( 'Min', 'imagekit' ),
-						'suffix'     => __( 'px', 'imagekit' ),
-						'default'    => 200,
-						'attributes' => array(
-							'type' => 'number',
-							'step' => 50,
+						array(
+							'type'       => 'input',
+							'slug'       => 'min_width',
+							'prefix'     => __( 'Min', 'imagekit' ),
+							'suffix'     => __( 'px', 'imagekit' ),
+							'default'    => 200,
+							'attributes' => array(
+								'type' => 'number',
+								'step' => 50,
+							),
 						),
 					),
 				),
