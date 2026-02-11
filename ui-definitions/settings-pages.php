@@ -280,10 +280,8 @@ $settings = array(
 						'element'             => 'a',
 						'requires_connection' => true,
 						'attributes'          => array(
-							'href'   => add_query_arg( 'section', 'system-report' ),
-							'target' => '_blank',
-							'rel'    => 'noopener noreferrer',
-							'class'  => array(
+							'href'  => add_query_arg( 'section', 'system-report' ),
+							'class' => array(
 								'large-button',
 							),
 						),
@@ -355,6 +353,10 @@ $settings = array(
 				),
 			),
 		),
+	),
+	'system-report'  => array(
+		'section' => 'system-report',
+		'slug'    => 'system-report',
 	),
 	'wizard'         => array(
 		'section' => 'wizard',

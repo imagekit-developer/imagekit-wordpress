@@ -4679,6 +4679,109 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./src/js/components/system-report.js":
+/*!********************************************!*\
+  !*** ./src/js/components/system-report.js ***!
+  \********************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/**
+ * System Report
+ *
+ * Handles copy-to-clipboard and download functionality for the system report page.
+ */
+class SystemReport {
+    constructor() {
+        this.copyButton = document.getElementById('ik-copy-report');
+        this.downloadButton = document.getElementById('ik-download-report');
+        this.notice = document.getElementById('ik-copy-notice');
+
+        if (this.copyButton) {
+            this.copyButton.addEventListener('click', () => this.copyToClipboard());
+        }
+
+        if (this.downloadButton) {
+            this.downloadButton.addEventListener('click', () => this.downloadReport());
+        }
+    }
+
+    getReportText() {
+        const el = this.copyButton || this.downloadButton;
+        return el ? el.getAttribute('data-report') : '';
+    }
+
+    async copyToClipboard() {
+        const text = this.getReportText();
+        if (!text) {
+            return;
+        }
+
+        try {
+            await navigator.clipboard.writeText(text);
+            this.showNotice();
+        } catch (err) {
+            // Fallback for older browsers.
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            this.showNotice();
+        }
+    }
+
+    showNotice() {
+        if (!this.notice) {
+            return;
+        }
+
+        this.notice.hidden = false;
+        clearTimeout(this.noticeTimeout);
+        this.noticeTimeout = setTimeout(() => {
+            this.notice.hidden = true;
+        }, 2000);
+    }
+
+    downloadReport() {
+        const text = this.getReportText();
+        if (!text) {
+            return;
+        }
+
+        const blob = new Blob([text], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'imagekit-system-report.txt';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+}
+
+const initSystemReport = () => {
+    if (document.querySelector('.ik-system-report')) {
+        new SystemReport();
+    }
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSystemReport);
+} else {
+    initSystemReport();
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (SystemReport);
+
+
+/***/ }),
+
 /***/ "./src/js/components/ui.js":
 /*!*********************************!*\
   !*** ./src/js/components/ui.js ***!
@@ -5458,6 +5561,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _css_main_scss__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../css/main.scss */ "./src/css/main.scss");
 /* harmony import */ var _components_ui__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./components/ui */ "./src/js/components/ui.js");
 /* harmony import */ var _components_wizard__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/wizard */ "./src/js/components/wizard.js");
+/* harmony import */ var _components_system_report__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/system-report */ "./src/js/components/system-report.js");
+
 
 
 
@@ -5468,6 +5573,7 @@ window.$ = window.jQuery;
 const imagekit = {
     UI: _components_ui__WEBPACK_IMPORTED_MODULE_1__["default"],
     Wizard: _components_wizard__WEBPACK_IMPORTED_MODULE_2__["default"],
+    SystemReport: _components_system_report__WEBPACK_IMPORTED_MODULE_3__["default"],
 };
 
 }();

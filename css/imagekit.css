@@ -1099,4 +1099,100 @@
   }
 }
 
+.ik-system-report .ik-system-report-column {
+  max-width: 800px;
+}
+.ik-system-report .ik-system-report-intro {
+  border-top: 0;
+  margin-top: 0;
+}
+.ik-system-report .ik-system-report-description {
+  margin: 0 0 16px;
+  color: rgba(0, 0, 1, 0.5);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.ik-system-report .ik-system-report-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.ik-system-report .ik-system-report-actions .button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.ik-system-report .ik-system-report-actions .button .dashicons {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  line-height: 1;
+}
+.ik-system-report .ik-report-section {
+  margin-top: 13px;
+  background: #fff;
+  border: 1px solid #c6d1db;
+  overflow: hidden;
+}
+.ik-system-report .ik-report-section-title {
+  margin: 0;
+  padding: 10px 24px;
+  font-size: 13px;
+  font-weight: 600;
+  background: #0b1b36;
+  color: #fff;
+}
+.ik-system-report .ik-report-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.ik-system-report .ik-report-table tr {
+  border-bottom: 1px solid #c6d1db;
+}
+.ik-system-report .ik-report-table tr:last-child {
+  border-bottom: none;
+}
+.ik-system-report .ik-report-table td {
+  padding: 8px 24px;
+  font-size: 12px;
+  vertical-align: top;
+  line-height: 1.6;
+}
+.ik-system-report .ik-report-table .ik-report-label {
+  width: 200px;
+  font-weight: 600;
+  color: rgb(11, 27, 54);
+  white-space: nowrap;
+}
+.ik-system-report .ik-report-table .ik-report-value {
+  color: rgba(0, 0, 1, 0.5);
+  word-break: break-all;
+}
+.ik-system-report .ik-copy-notice {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  padding: 12px 20px;
+  background: #20b832;
+  color: #fff;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 100000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  animation: ik-fade-in 0.2s ease;
+}
+
+@keyframes ik-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /*# sourceMappingURL=imagekit.css.map*/
