@@ -57,6 +57,7 @@ class Admin {
 		add_action( 'imagekit_init_settings', array( $this, 'init_settings' ) );
 		add_action( 'admin_init', array( $this, 'init_setting_save' ), PHP_INT_MAX );
 		add_action( 'admin_menu', array( $this, 'build_menus' ) );
+		add_filter( 'pre_update_option_imagekit_media_display', array( $this, 'validate_responsive_width_limits' ) );
 		// add_filter( 'imagekit_api_rest_endpoints', array( $this, 'rest_endpoints' ) );
 	}
 
@@ -297,6 +298,19 @@ class Admin {
 		return $this->component;
 	}
 
+
+	public function validate_responsive_width_limits( $value ) {
+		if ( ! is_array( $value ) ) {
+			return $value;
+		}
+		$min = isset( $value['min_width'] ) && '' !== $value['min_width'] ? (int) $value['min_width'] : null;
+		$max = isset( $value['max_width'] ) && '' !== $value['max_width'] ? (int) $value['max_width'] : null;
+		if ( null !== $min && null !== $max && $min > $max ) {
+			$value['min_width'] = (string) $max;
+			$value['max_width'] = (string) $min;
+		}
+		return $value;
+	}
 
 	protected function save_settings( $submission, $data ) {
 		$page    = $this->settings->get_setting( $submission );

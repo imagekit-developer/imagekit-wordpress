@@ -96,23 +96,7 @@ class Utils {
 	 * @return string
 	 */
 	public static function get_support_link() {
-
-		$user   = wp_get_current_user();
-		$plugin = get_plugin_instance();
-		$url    = 'mailto:support@imagekit.io';
-
-		$args = array(
-			'subject' => esc_attr(
-				sprintf(
-					// translators: The plugin version.
-					__( 'I need help with ImageKit WordPress plugin version %s', 'imagekit' ),
-					$plugin->version
-				)
-			),
-			'body'    => esc_attr( __( 'Please, provide more details on your request, and if possible, attach a System Report', 'imagekit' ) ),
-		);
-
-		return add_query_arg( $args, $url );
+		return 'https://community.imagekit.io';
 	}
 
 

@@ -239,6 +239,32 @@ class Input extends Component {
 			$value = $this->setting->get_param( 'default' );
 		}
 
-		return sanitize_text_field( $value );
+		$value = sanitize_text_field( $value );
+
+		return $this->validate_value( $value );
+	}
+
+	/**
+	 * Validate the value against input attributes.
+	 *
+	 * Clamps numeric values to the min/max bounds defined in the input attributes.
+	 *
+	 * @param string $value The value to validate.
+	 *
+	 * @return string
+	 */
+	public function validate_value( $value ) {
+		$attributes = $this->setting->has_param( 'attributes' ) ? $this->setting->get_param( 'attributes' ) : array();
+		if ( is_array( $attributes ) && isset( $attributes['type'] ) && 'number' === $attributes['type'] && '' !== $value ) {
+			$numeric = (float) $value;
+			if ( isset( $attributes['min'] ) && $numeric < (float) $attributes['min'] ) {
+				$value = (string) $attributes['min'];
+			}
+			if ( isset( $attributes['max'] ) && $numeric > (float) $attributes['max'] ) {
+				$value = (string) $attributes['max'];
+			}
+		}
+
+		return $value;
 	}
 }

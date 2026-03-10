@@ -1,7 +1,4 @@
 /******/ (function() { // webpackBootstrap
-/*!******************************************!*\
-  !*** ./src/js/components/media-modal.js ***!
-  \******************************************/
 if (wp.media) {
   function generateImageKitSearchQuery(type) {
     if (typeof type !== 'string' && !Array.isArray(type) && !(Array.isArray(type) && type.length === 0)) {
@@ -201,4 +198,3 @@ if (wp.media) {
 }
 /******/ })()
 ;
-//# sourceMappingURL=media-modal.js.map

@@ -3,6 +3,7 @@
 namespace ImageKitWordpress;
 
 use ImageKitWordpress\Component\Setup;
+use ImageKitWordpress\Media\Asset_Rewriter;
 use ImageKitWordpress\Media\Rewriter;
 
 class Media extends Settings_Component implements Setup {
@@ -17,6 +18,16 @@ class Media extends Settings_Component implements Setup {
 	public $plugin;
 
 	public $base_url;
+
+	/**
+	 * @var Delivery
+	 */
+	public $delivery;
+
+	/**
+	 * @var Asset_Rewriter
+	 */
+	public $asset_rewriter;
 
 	// /**
 	// * Credentials.
@@ -36,14 +47,19 @@ class Media extends Settings_Component implements Setup {
 			$this->credentials       = $this->plugin->get_component('credentials_manager')->get_credentials();
 			$this->imagekit_folder = $this->settings->get_value( slugs: 'imagekit_folder' );
 			$this->uploader        = $this->plugin->get_component( 'uploader' );
+			$this->delivery        = $this->plugin->get_component( 'delivery' );
 			$this->rewriter        = new Rewriter( $this->plugin, $this->settings, $this->base_url, $this->imagekit_folder );
 			$this->rewriter->setup();
+
+			$this->asset_rewriter = new Asset_Rewriter( $this->plugin, $this->delivery, $this->base_url );
+			$this->asset_rewriter->setup();
 
 			// Rewriter
 			// $this->filter                 = new Filter( $this );
 
 			add_action( 'print_media_templates', callback: array( $this, 'media_template' ) );
 			add_action( 'wp_enqueue_media', array( $this, 'editor_assets' ) );
+			add_action( 'enqueue_block_editor_assets', array( $this, 'block_editor_assets' ) );
 			add_action( 'wp_ajax_imagekit-down-sync', callback: array( $this, 'down_sync_asset' ) );
 			add_action( 'imagekit_download_asset', array( $this, 'maybe_copy_eml_asset_to_wordpress' ), 10, 2 );
 
@@ -127,6 +143,22 @@ class Media extends Settings_Component implements Setup {
 		);
 
 		wp_add_inline_script( 'imagekit-media-library', 'var IKML = ' . wp_json_encode( $params ) . ';', 'after' );
+	}
+
+	public function block_editor_assets() {
+		$asset_file = $this->plugin->dir_path . 'js/block-editor.asset.php';
+		$asset      = file_exists( $asset_file ) ? include $asset_file : array(
+			'dependencies' => array(),
+			'version'      => $this->plugin->version,
+		);
+
+		wp_enqueue_script(
+			'imagekit-block-editor',
+			$this->plugin->dir_url . 'js/block-editor.js',
+			$asset['dependencies'],
+			$asset['version'],
+			true
+		);
 	}
 
 	public function down_sync_asset() {
@@ -570,23 +602,12 @@ class Media extends Settings_Component implements Setup {
 		return $raw;
 	}
 
-	private function is_image_delivery_enabled() {
-		$config = $this->settings ? $this->settings->get_value( 'media_display' ) : null;
-		if ( ! is_array( $config ) ) {
-			return true;
-		}
-		if ( ! empty( $config['image_delivery'] ) && 'off' === $config['image_delivery'] ) {
-			return false;
-		}
-		return true;
-	}
-
 	public function attachment_url( $url, $post_id ) {
 		if ( empty( $post_id ) || ! $this->is_imagekit_attachment( $post_id ) ) {
 			return $url;
 		}
 		$has_local = $this->has_local_file( $post_id );
-		if ( $this->is_image_delivery_enabled() || ! $has_local ) {
+		if ( $this->delivery->is_image_delivery_enabled() || ! $has_local ) {
 			return $this->get_imagekit_attachment_base_url( $post_id, $url );
 		}
 		return $url;
@@ -597,7 +618,7 @@ class Media extends Settings_Component implements Setup {
 			return $url;
 		}
 		$has_local = $this->has_local_file( $attachment_id );
-		if ( $this->is_image_delivery_enabled() || ! $has_local ) {
+		if ( $this->delivery->is_image_delivery_enabled() || ! $has_local ) {
 			return $this->get_imagekit_attachment_base_url( $attachment_id, $url );
 		}
 		return $url;
@@ -608,7 +629,7 @@ class Media extends Settings_Component implements Setup {
 			return $downsize;
 		}
 		$has_local = $this->has_local_file( $id );
-		if ( ! $this->is_image_delivery_enabled() && $has_local ) {
+		if ( ! $this->delivery->is_image_delivery_enabled() && $has_local ) {
 			return $downsize;
 		}
 
@@ -640,7 +661,9 @@ class Media extends Settings_Component implements Setup {
 			$is_intermediate = false;
 		}
 
-		$url = $this->build_imagekit_srcset_url( $base, $id, $width, $height );
+		$url = $is_intermediate
+			? $this->build_imagekit_srcset_url( $base, $id, $width, $height )
+			: $this->build_imagekit_srcset_url( $base, $id, null, null );
 		return array( $url, (int) ( $width ?? 0 ), (int) ( $height ?? 0 ), $is_intermediate );
 	}
 
@@ -649,7 +672,7 @@ class Media extends Settings_Component implements Setup {
 			return $image_meta;
 		}
 		$has_local = $this->has_local_file( $attachment_id );
-		if ( ! $this->is_image_delivery_enabled() && $has_local ) {
+		if ( ! $this->delivery->is_image_delivery_enabled() && $has_local ) {
 			return $image_meta;
 		}
 
@@ -819,7 +842,14 @@ class Media extends Settings_Component implements Setup {
 		$config = $this->settings->get_value( 'image_settings' );
 
 		if (!empty($config['image_global_transformation'])) {
-			$default[] = trim($config['image_global_transformation']);
+			$parts = array_map( 'trim', explode( ',', $config['image_global_transformation'] ) );
+			$parts = array_filter(
+				$parts,
+				static function ( $t ) {
+					return is_string( $t ) && '' !== $t;
+				}
+			);
+			$default = array_merge( $default, array_values( $parts ) );
 		}
 
 		return $default;
@@ -960,8 +990,14 @@ class Media extends Settings_Component implements Setup {
 	 * @return array Altered or same sources array.
 	 */
 	public function image_srcset($sources, $size_array, $image_src, $image_meta, $attachment_id) {
-		$media_display       = $this->settings->get_value( 'media_display' );
-		$breakpoints_enabled = is_array( $media_display ) && ! empty( $media_display['enable_breakpoints'] ) && 'on' === $media_display['enable_breakpoints'];
+		if ( ! empty( $attachment_id ) ) {
+			$has_local = $this->has_local_file( $attachment_id );
+			if ( ! $this->delivery->is_image_delivery_enabled() && $has_local ) {
+				return $sources;
+			}
+		}
+
+		$breakpoints_enabled = $this->delivery->is_breakpoints_enabled();
 
 		$ratio_matches = false;
 		if (

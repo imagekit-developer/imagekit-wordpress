@@ -63,7 +63,7 @@ class Rewriter {
 		if ( ! is_string( $html ) || '' === $html ) {
 			return $html;
 		}
-		if ( false === strpos( $html, '<img' ) && false === strpos( $html, '<source' ) ) {
+		if ( false === strpos( $html, '<img' ) && false === strpos( $html, '<source' ) && false === strpos( $html, '<video' ) ) {
 			return $html;
 		}
 
@@ -86,18 +86,11 @@ class Rewriter {
 	}
 
 	protected function get_direction() {
-		if ( $this->is_image_delivery_enabled() ) {
+		$delivery = $this->plugin->get_component( 'delivery' );
+		if ( $delivery && $delivery->is_image_delivery_enabled() ) {
 			return 'to_ik';
 		}
 		return 'to_wp';
-	}
-
-	protected function is_image_delivery_enabled() {
-		$config = $this->settings ? $this->settings->get_value( 'media_display' ) : null;
-		if ( ! is_array( $config ) ) {
-			return true;
-		}
-		return empty( $config['image_delivery'] ) || 'on' === $config['image_delivery'];
 	}
 
 	protected function get_offload_mode() {
@@ -140,6 +133,15 @@ class Rewriter {
 				continue;
 			}
 			$this->rewrite_element_attrs( $source, array(), array( 'srcset', 'data-srcset' ) );
+		}
+
+		$videos = $doc->getElementsByTagName( 'video' );
+		for ( $i = $videos->length - 1; $i >= 0; $i-- ) {
+			$video = $videos->item( $i );
+			if ( ! $video ) {
+				continue;
+			}
+			$this->rewrite_element_attrs( $video, array( 'poster' ), array() );
 		}
 
 		$out = $doc->saveHTML();
@@ -187,7 +189,7 @@ class Rewriter {
 			$html
 		);
 
-		return preg_replace_callback(
+		$html = preg_replace_callback(
 			'#<source\b[^>]*>#i',
 			static function ( $m ) use ( $self ) {
 				$tag = $m[0];
@@ -197,10 +199,20 @@ class Rewriter {
 			},
 			$html
 		);
+
+		return preg_replace_callback(
+			'#<video\b[^>]*>#i',
+			static function ( $m ) use ( $self ) {
+				$tag = $m[0];
+				$tag = $self->rewrite_tag_attr( $tag, 'poster' );
+				return $tag;
+			},
+			$html
+		);
 	}
 
 	protected function rewrite_tag_attr( $tag, $attr ) {
-		$pattern = '#\b' . preg_quote( $attr, '#' ) . '\s*=\s*(["\"])\s*([^"\"]+)\s*\1#i';
+		$pattern = '#\b' . preg_quote( $attr, '#' ) . '\s*=\s*(["\'])\s*([^"\']+)\s*\1#i';
 		return preg_replace_callback(
 			$pattern,
 			function ( $m ) use ( $attr ) {
@@ -217,7 +229,7 @@ class Rewriter {
 	}
 
 	protected function rewrite_tag_srcset_attr( $tag, $attr ) {
-		$pattern = '#\b' . preg_quote( $attr, '#' ) . '\s*=\s*(["\"])\s*([^"\"]+)\s*\1#i';
+		$pattern = '#\b' . preg_quote( $attr, '#' ) . '\s*=\s*(["\'])\s*([^"\']+)\s*\1#i';
 		return preg_replace_callback(
 			$pattern,
 			function ( $m ) use ( $attr ) {
@@ -261,6 +273,9 @@ class Rewriter {
 
 	protected function rewrite_url( $url ) {
 		if ( ! is_string( $url ) || '' === $url ) {
+			return $url;
+		}
+		if ( apply_filters( 'imagekit_exclude_url', false, $url ) ) {
 			return $url;
 		}
 		if ( 'to_wp' === $this->direction ) {

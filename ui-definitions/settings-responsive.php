@@ -74,6 +74,7 @@ $settings = array(
 							'attributes'  => array(
 								'type' => 'number',
 								'step' => 50,
+								'min'  => 0,
 							),
 						),
 						array(
@@ -85,6 +86,7 @@ $settings = array(
 							'attributes' => array(
 								'type' => 'number',
 								'step' => 50,
+								'min'  => 0,
 							),
 						),
 					),

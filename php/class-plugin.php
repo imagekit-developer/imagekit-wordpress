@@ -271,6 +271,7 @@ final class Plugin {
 		$this->components['state']               = new State( $this );
 		$this->components['credentials_manager'] = new Credentials_Manager( $this );
 		$this->components['uploader']            = new Uploader( $this );
+		$this->components['delivery']            = new Delivery( $this );
 		$this->components['media']               = new Media( $this );
 		$this->components['rest_api']            = new REST_API( $this );
 	}

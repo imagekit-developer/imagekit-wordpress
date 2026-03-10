@@ -210,6 +210,7 @@ class Credentials extends Component {
 		$struct['attributes']['name']         = 'credentials[url_endpoint]';
 		$struct['attributes']['value']        = '';
 		$struct['attributes']['data-confirm'] = __( 'Are you sure you want to disconnect from ImageKit?', 'imagekit' );
+		$struct['attributes']['onclick']      = 'return confirm(this.getAttribute("data-confirm"))';
 		$struct['attributes']['class']        = array( 'button', 'ik-connect-disconnect' );
 
 		return $struct;

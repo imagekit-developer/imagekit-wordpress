@@ -51,6 +51,14 @@ $settings = array(
 		'sidebar'             => true,
 		'settings'            => include $this->dir_path . 'ui-definitions/settings-video.php', // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.UsingVariable
 	),
+	'asset_settings' => array(
+		'page_title'          => __( 'Asset settings', 'imagekit' ),
+		'menu_title'          => __( 'Asset settings', 'imagekit' ),
+		'priority'            => 5,
+		'requires_connection' => true,
+		'sidebar'             => true,
+		'settings'            => include $this->dir_path . 'ui-definitions/settings-assets.php', // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.UsingVariable
+	),
 	'responsive'     => array(
 		'page_title'          => __( 'Responsive images', 'imagekit' ),
 		'menu_title'          => __( 'Responsive images', 'imagekit' ),
@@ -192,7 +200,7 @@ $settings = array(
 										'help-box-header-title',
 									),
 								),
-								'content'    => __( 'Ask in support forum', 'imagekit' ),
+								'content'    => __( 'Ask in community', 'imagekit' ),
 							),
 						),
 						array(
@@ -201,7 +209,7 @@ $settings = array(
 							'attributes' => array(
 								'class' => array( 'help-box-description' ),
 							),
-							'content'    => __( 'Have a question or hit a snag? Post in our support forum to get help from the community.', 'imagekit' ),
+							'content'    => __( 'Have a question or hit a snag? Post in our community forum to get help.', 'imagekit' ),
 						),
 					),
 				),

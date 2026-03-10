@@ -75,4 +75,12 @@ if (contexts.length) {
     });
 }
 
+document.addEventListener('click', function (ev) {
+    const el = ev.target.closest('[data-confirm]');
+    if (el && !window.confirm(el.dataset.confirm)) {
+        ev.preventDefault();
+        ev.stopPropagation();
+    }
+});
+
 export default UI;

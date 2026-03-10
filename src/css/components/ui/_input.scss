@@ -107,10 +107,19 @@
 
 	&-toggle + .ik-group {
 		border-top: 1px solid $color-ik-grey-blue;
+		margin-top: 20px;
 		padding-top: 20px;
 	}
 
 	&-toggle {
+		> .ik-tooltip {
+			display: none;
+		}
+
+		+ .ik-input-toggle {
+			margin-top: 20px;
+		}
+
 		> span.ik-toggle {
 			display: grid;
 			grid-template-columns: 1fr auto;
