@@ -81,17 +81,17 @@ class Media extends Settings_Component implements Setup {
 			return;
 		}
 
-		$this->base_url = rtrim( $url_endpoint, '/' );
+		$this->base_url        = rtrim( $url_endpoint, '/' );
 		$this->imagekit_folder = $this->settings->get_value( slugs: 'imagekit_folder' );
 		$this->delivery        = $this->plugin->get_component( 'delivery' );
 		$this->rewriter        = new Rewriter( $this->plugin, $this->settings, $this->base_url, $this->imagekit_folder );
-		$this->asset_rewriter = new Asset_Rewriter( $this->plugin, $this->delivery, $this->base_url );
+		$this->asset_rewriter  = new Asset_Rewriter( $this->plugin, $this->delivery, $this->base_url );
 
 		// Cache site info for the buffer rewriter (avoids DB calls during rewrite).
-		$this->site_url  = rtrim( site_url(), '/' );
-		$this->site_host = (string) wp_parse_url( $this->site_url, PHP_URL_HOST );
-		$parsed_path     = wp_parse_url( $this->site_url, PHP_URL_PATH );
-		$this->site_path = is_string( $parsed_path ) ? rtrim( $parsed_path, '/' ) : '';
+		$this->site_url   = rtrim( site_url(), '/' );
+		$this->site_host  = (string) wp_parse_url( $this->site_url, PHP_URL_HOST );
+		$parsed_path      = wp_parse_url( $this->site_url, PHP_URL_PATH );
+		$this->site_path  = is_string( $parsed_path ) ? rtrim( $parsed_path, '/' ) : '';
 		$this->upload_dir = wp_get_upload_dir();
 
 		add_action( 'template_redirect', array( $this, 'maybe_start_output_buffer_rewrite' ), 0 );
@@ -190,7 +190,7 @@ class Media extends Settings_Component implements Setup {
 		$html = $this->rewrite_srcset_attributes( $html, $ext_pattern );
 
 		// Step 2: Rewrite absolute local URLs (https?://site_host/path.ext).
-		$abs_pattern  = '#(?<=["\'\s(,])(https?://' . $host_re . '(?::[0-9]+)?/[^\s"\'<>)?\#]+\.(?:' . $ext_pattern . ')(?:\?[^\s"\'<>)]*)?)(?=["\'\s)<>,])#i';
+		$abs_pattern = '#(?<=["\'\s(,])(https?://' . $host_re . '(?::[0-9]+)?/[^\s"\'<>)?\#]+\.(?:' . $ext_pattern . ')(?:\?[^\s"\'<>)]*)?)(?=["\'\s)<>,])#i';
 
 		$self = $this;
 		$html = preg_replace_callback(
@@ -207,7 +207,15 @@ class Media extends Settings_Component implements Setup {
 			$rel_prefixes[] = $this->site_path . '/wp-content/';
 			$rel_prefixes[] = $this->site_path . '/wp-includes/';
 		}
-		$rel_prefix_re = implode( '|', array_map( function ( $p ) { return preg_quote( $p, '#' ); }, $rel_prefixes ) );
+		$rel_prefix_re = implode(
+			'|',
+			array_map(
+				function ( $p ) {
+					return preg_quote( $p, '#' );
+				},
+				$rel_prefixes
+			)
+		);
 
 		$rel_pattern = '#(?<=["\'\s(,])(' . '(?:' . $rel_prefix_re . ')' . '[^\s"\'<>)?\#]+\.(?:' . $ext_pattern . ')(?:\?[^\s"\'<>)]*)?)(?=["\'\s)<>,])#i';
 
@@ -234,15 +242,35 @@ class Media extends Settings_Component implements Setup {
 	protected function get_rewritable_extensions() {
 		$defaults = array(
 			// Images.
-			'jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'ico', 'bmp', 'avif', 'tiff',
+			'jpg',
+			'jpeg',
+			'png',
+			'gif',
+			'webp',
+			'svg',
+			'ico',
+			'bmp',
+			'avif',
+			'tiff',
 			// Fonts.
-			'woff', 'woff2', 'ttf', 'eot', 'otf',
+			'woff',
+			'woff2',
+			'ttf',
+			'eot',
+			'otf',
 			// CSS / JS.
-			'css', 'js',
+			'css',
+			'js',
 			// Media.
-			'mp4', 'webm', 'ogg', 'mp3', 'wav', 'flac',
+			'mp4',
+			'webm',
+			'ogg',
+			'mp3',
+			'wav',
+			'flac',
 			// Other.
-			'pdf', 'map',
+			'pdf',
+			'map',
 		);
 
 		$extensions = apply_filters( 'imagekit_rewritable_extensions', $defaults );
@@ -590,7 +618,7 @@ class Media extends Settings_Component implements Setup {
 
 		wp_enqueue_script( 'imagekit-media-modal', $this->plugin->dir_url . '/js/media-modal.js', array(), $this->plugin->version, true );
 		// wp_enqueue_script( 'imagekit-media-library', $this->plugin->dir_url . '/js/eml.js', array(), $this->plugin->version, true );
-		wp_enqueue_script('imagekit-media-library', $eml_url, [], IMAGEKIT_EML_VERSION, true);
+		wp_enqueue_script( 'imagekit-media-library', $eml_url, array(), IMAGEKIT_EML_VERSION, true );
 		wp_enqueue_style( 'imagekit' );
 
 		$params = array(
@@ -644,7 +672,7 @@ class Media extends Settings_Component implements Setup {
 				'url'           => $asset['url'],
 				'filename'      => $asset['name'] ?? wp_basename( $asset['src'] ),
 				'attachment_id' => $asset['attachment_id'],
-				'fileId'            => $asset['fileId'],
+				'fileId'        => $asset['fileId'],
 			);
 
 			if ( empty( $asset['attachment_id'] ) ) {
@@ -652,7 +680,7 @@ class Media extends Settings_Component implements Setup {
 				$asset['attachment_id']  = $this->create_attachment( $asset, $asset['fileId'] );
 				$return['attachment_id'] = $asset['attachment_id'];
 			} else {
-				$return              = wp_prepare_attachment_for_js( $asset['attachment_id'] );
+				$return           = wp_prepare_attachment_for_js( $asset['attachment_id'] );
 				$return['fileId'] = $asset['fileId'];
 			}
 
@@ -767,7 +795,7 @@ class Media extends Settings_Component implements Setup {
 		if ( $post_obj && empty( $post_obj->post_mime_type ) ) {
 			$sideload_type = ! empty( $sideload['type'] ) ? $sideload['type'] : '';
 			if ( '' === $sideload_type ) {
-				$detected = wp_check_filetype( $local_file );
+				$detected      = wp_check_filetype( $local_file );
 				$sideload_type = ! empty( $detected['type'] ) ? $detected['type'] : '';
 			}
 			if ( '' !== $sideload_type ) {
@@ -1417,11 +1445,11 @@ class Media extends Settings_Component implements Setup {
 	private function create_attachment( $asset, $fileId ) {
 
 		// Create an attachment post.
-		$file_path        = $asset['url'];
+		$file_path = $asset['url'];
 		// Strip query string before extracting filename (e.g. image.jpg?updatedAt=123).
-		$clean_url        = preg_replace( '/\?.*$/', '', $file_path );
-		$file_name        = wp_basename( $clean_url );
-		$file_type        = wp_check_filetype( $file_name, null );
+		$clean_url = preg_replace( '/\?.*$/', '', $file_path );
+		$file_name = wp_basename( $clean_url );
+		$file_type = wp_check_filetype( $file_name, null );
 		// Fall back to the MIME type from the asset payload if detection failed.
 		if ( empty( $file_type['type'] ) && ! empty( $asset['mime'] ) ) {
 			$file_type['type'] = sanitize_mime_type( $asset['mime'] );
@@ -1546,13 +1574,13 @@ class Media extends Settings_Component implements Setup {
 	}
 
 
-	public function default_image_global_transformations($default) {
+	public function default_image_global_transformations( $default ) {
 
 		$config = $this->settings->get_value( 'image_settings' );
 
-		if (!empty($config['image_global_transformation'])) {
-			$parts = array_map( 'trim', explode( ',', $config['image_global_transformation'] ) );
-			$parts = array_filter(
+		if ( ! empty( $config['image_global_transformation'] ) ) {
+			$parts   = array_map( 'trim', explode( ',', $config['image_global_transformation'] ) );
+			$parts   = array_filter(
 				$parts,
 				static function ( $t ) {
 					return is_string( $t ) && '' !== $t;
@@ -1741,7 +1769,7 @@ class Media extends Settings_Component implements Setup {
 	 *
 	 * @return array Altered or same sources array.
 	 */
-	public function image_srcset($sources, $size_array, $image_src, $image_meta, $attachment_id) {
+	public function image_srcset( $sources, $size_array, $image_src, $image_meta, $attachment_id ) {
 		if ( ! empty( $attachment_id ) ) {
 			$has_local = $this->has_local_file( $attachment_id );
 			if ( ! $this->delivery->is_image_delivery_enabled() && $has_local ) {
@@ -1753,9 +1781,9 @@ class Media extends Settings_Component implements Setup {
 				if ( ! is_array( $image_meta ) || empty( $image_meta['file'] ) || empty( $image_meta['width'] ) || empty( $image_meta['height'] ) ) {
 					return $sources;
 				}
-				$full_w    = (int) $image_meta['width'];
-				$full_h    = (int) $image_meta['height'];
-				$local_url = rtrim( $this->upload_dir['baseurl'], '/' ) . '/' . $image_meta['file'];
+				$full_w     = (int) $image_meta['width'];
+				$full_h     = (int) $image_meta['height'];
+				$local_url  = rtrim( $this->upload_dir['baseurl'], '/' ) . '/' . $image_meta['file'];
 				$proxy_base = $this->proxy_url( $local_url );
 
 				$widths      = $this->get_srcset_widths_from_settings( $full_w );
@@ -1842,7 +1870,7 @@ class Media extends Settings_Component implements Setup {
 			return $sources;
 		}
 
-		$converted = array();
+		$converted          = array();
 		$largest_source_url = '';
 		$largest_width      = 0;
 		foreach ( $sources as $key => $source ) {
@@ -1892,8 +1920,8 @@ class Media extends Settings_Component implements Setup {
 				$height = (int) round( (float) $width * (float) $aspect_ratio );
 			}
 
-			$source['url']      = $this->build_imagekit_srcset_url( $largest_source_url, $attachment_id, $width, $height );
-			$converted[ $key ]  = $source;
+			$source['url']     = $this->build_imagekit_srcset_url( $largest_source_url, $attachment_id, $width, $height );
+			$converted[ $key ] = $source;
 		}
 
 		return $converted;

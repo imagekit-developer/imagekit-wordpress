@@ -144,7 +144,7 @@ class Credentials_Manager extends Settings_Component implements Config, Setup {
 			$status = 502;
 		}
 
-		$message = ! empty( $result['message'] ) ? (string) $result['message'] : __( 'Unable to verify connection.', 'imagekit' );
+		$message           = ! empty( $result['message'] ) ? (string) $result['message'] : __( 'Unable to verify connection.', 'imagekit' );
 		$result['message'] = $message;
 
 		$error = new \WP_Error(
@@ -346,8 +346,8 @@ class Credentials_Manager extends Settings_Component implements Config, Setup {
 
 		$test_url_endpoint = $this->test_url_endpoint( $url_endpoint );
 
-		$has_keys = '' !== $public_key || '' !== $private_key;
-		$test_public_key = true;
+		$has_keys         = '' !== $public_key || '' !== $private_key;
+		$test_public_key  = true;
 		$test_private_key = true;
 		if ( $has_keys ) {
 			$test_public_key  = '' !== $public_key && str_starts_with( $public_key, 'public_' );
@@ -413,9 +413,9 @@ class Credentials_Manager extends Settings_Component implements Config, Setup {
 		$test_result = $this->check_status();
 
 		if ( is_wp_error( $test_result ) ) {
-			$error_code    = $test_result->get_error_code();
-			$error_message = $test_result->get_error_message();
-			$result['ok']  = false;
+			$error_code        = $test_result->get_error_code();
+			$error_message     = $test_result->get_error_message();
+			$result['ok']      = false;
 			$result['message'] = $error_message;
 
 			$normalized_message = strtolower( trim( (string) $error_message ) );

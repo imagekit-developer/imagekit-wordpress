@@ -7,10 +7,10 @@
 
 namespace ImageKitWordpress;
 
-$imagekit  = get_plugin_instance();
-$report    = System_Report::get_report();
-$text      = System_Report::get_report_text();
-$back_url  = admin_url( 'admin.php?page=imagekit_help' );
+$imagekit = get_plugin_instance();
+$report   = System_Report::get_report();
+$text     = System_Report::get_report_text();
+$back_url = admin_url( 'admin.php?page=imagekit_help' );
 
 ?>
 <div class="ik-ui-wrap ik-page ik-settings ik-system-report" id="imagekit-settings-page">

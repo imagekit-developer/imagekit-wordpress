@@ -18,19 +18,19 @@ class System_Report {
 	 */
 	public static function get_report() {
 		return array(
-			'WordPress'          => self::get_wordpress_info(),
-			'ImageKit Plugin'    => self::get_plugin_info(),
-			'ImageKit Settings'  => self::get_settings_info(),
-			'ImageKit Usage'     => self::get_usage_info(),
-			'Media Library'      => self::get_media_info(),
-			'Server'             => self::get_server_info(),
-			'PHP'                => self::get_php_info(),
-			'Database'           => self::get_database_info(),
+			'WordPress'           => self::get_wordpress_info(),
+			'ImageKit Plugin'     => self::get_plugin_info(),
+			'ImageKit Settings'   => self::get_settings_info(),
+			'ImageKit Usage'      => self::get_usage_info(),
+			'Media Library'       => self::get_media_info(),
+			'Server'              => self::get_server_info(),
+			'PHP'                 => self::get_php_info(),
+			'Database'            => self::get_database_info(),
 			'WordPress Constants' => self::get_constants_info(),
-			'Filesystem'         => self::get_filesystem_info(),
-			'Active Theme'       => self::get_theme_info(),
-			'Active Plugins'     => self::get_active_plugins(),
-			'Must-Use Plugins'   => self::get_mu_plugins(),
+			'Filesystem'          => self::get_filesystem_info(),
+			'Active Theme'        => self::get_theme_info(),
+			'Active Plugins'      => self::get_active_plugins(),
+			'Must-Use Plugins'    => self::get_mu_plugins(),
 		);
 	}
 
@@ -63,19 +63,19 @@ class System_Report {
 		global $wp_version;
 
 		$info = array(
-			'Version'         => $wp_version,
-			'Site URL'        => get_site_url(),
-			'Home URL'        => get_home_url(),
-			'Multisite'       => is_multisite() ? 'Yes' : 'No',
-			'Permalink'       => get_option( 'permalink_structure' ) ?: 'Plain',
-			'Language'        => get_locale(),
-			'Memory Limit'    => defined( 'WP_MEMORY_LIMIT' ) ? WP_MEMORY_LIMIT : 'Not set',
-			'Debug Mode'      => ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ? 'Enabled' : 'Disabled',
-			'Debug Log'       => ( defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) ? 'Enabled' : 'Disabled',
-			'Cron'            => ( defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON ) ? 'Disabled' : 'Enabled',
-			'Timezone'        => wp_timezone_string(),
-			'Object Cache'    => wp_using_ext_object_cache() ? 'External' : 'Default',
-			'ABSPATH'         => ABSPATH,
+			'Version'      => $wp_version,
+			'Site URL'     => get_site_url(),
+			'Home URL'     => get_home_url(),
+			'Multisite'    => is_multisite() ? 'Yes' : 'No',
+			'Permalink'    => get_option( 'permalink_structure' ) ?: 'Plain',
+			'Language'     => get_locale(),
+			'Memory Limit' => defined( 'WP_MEMORY_LIMIT' ) ? WP_MEMORY_LIMIT : 'Not set',
+			'Debug Mode'   => ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ? 'Enabled' : 'Disabled',
+			'Debug Log'    => ( defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) ? 'Enabled' : 'Disabled',
+			'Cron'         => ( defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON ) ? 'Disabled' : 'Enabled',
+			'Timezone'     => wp_timezone_string(),
+			'Object Cache' => wp_using_ext_object_cache() ? 'External' : 'Default',
+			'ABSPATH'      => ABSPATH,
 		);
 
 		return $info;
@@ -108,7 +108,7 @@ class System_Report {
 
 		$manager = $plugin->get_component( 'credentials_manager' );
 		if ( $manager && method_exists( $manager, 'get_credentials' ) ) {
-			$credentials = (array) $manager->get_credentials();
+			$credentials          = (array) $manager->get_credentials();
 			$info['URL Endpoint'] = ! empty( $credentials['url_endpoint'] ) ? $credentials['url_endpoint'] : '(not set)';
 			// Mask the keys for security.
 			$info['Public Key']  = ! empty( $credentials['public_key'] ) ? self::mask_key( $credentials['public_key'] ) : '(not set)';
@@ -154,14 +154,14 @@ class System_Report {
 		$server_software = ! empty( $_SERVER['SERVER_SOFTWARE'] ) ? sanitize_text_field( wp_unslash( $_SERVER['SERVER_SOFTWARE'] ) ) : 'Unknown';
 
 		$info = array(
-			'Software'      => $server_software,
-			'HTTPS'         => is_ssl() ? 'Yes' : 'No',
-			'Max Input Vars' => ini_get( 'max_input_vars' ) ?: 'Unknown',
+			'Software'        => $server_software,
+			'HTTPS'           => is_ssl() ? 'Yes' : 'No',
+			'Max Input Vars'  => ini_get( 'max_input_vars' ) ?: 'Unknown',
 			'Max Upload Size' => size_format( wp_max_upload_size() ),
-			'Max Post Size'  => ini_get( 'post_max_size' ) ?: 'Unknown',
-			'Max Exec Time'  => ini_get( 'max_execution_time' ) . 's',
-			'cURL Version'   => function_exists( 'curl_version' ) ? curl_version()['version'] : 'Not available',
-			'cURL SSL'       => function_exists( 'curl_version' ) ? ( curl_version()['ssl_version'] ?? 'N/A' ) : 'Not available',
+			'Max Post Size'   => ini_get( 'post_max_size' ) ?: 'Unknown',
+			'Max Exec Time'   => ini_get( 'max_execution_time' ) . 's',
+			'cURL Version'    => function_exists( 'curl_version' ) ? curl_version()['version'] : 'Not available',
+			'cURL SSL'        => function_exists( 'curl_version' ) ? ( curl_version()['ssl_version'] ?? 'N/A' ) : 'Not available',
 		);
 
 		return $info;
@@ -174,14 +174,14 @@ class System_Report {
 	 */
 	protected static function get_php_info() {
 		$info = array(
-			'Version'          => phpversion(),
-			'SAPI'             => php_sapi_name(),
-			'Memory Limit'     => ini_get( 'memory_limit' ) ?: 'Unknown',
-			'GD Library'       => extension_loaded( 'gd' ) ? 'Available' : 'Not available',
-			'Imagick'          => extension_loaded( 'imagick' ) ? 'Available' : 'Not available',
-			'Exif'             => extension_loaded( 'exif' ) ? 'Available' : 'Not available',
-			'mbstring'         => extension_loaded( 'mbstring' ) ? 'Available' : 'Not available',
-			'OpenSSL'          => extension_loaded( 'openssl' ) ? OPENSSL_VERSION_TEXT : 'Not available',
+			'Version'      => phpversion(),
+			'SAPI'         => php_sapi_name(),
+			'Memory Limit' => ini_get( 'memory_limit' ) ?: 'Unknown',
+			'GD Library'   => extension_loaded( 'gd' ) ? 'Available' : 'Not available',
+			'Imagick'      => extension_loaded( 'imagick' ) ? 'Available' : 'Not available',
+			'Exif'         => extension_loaded( 'exif' ) ? 'Available' : 'Not available',
+			'mbstring'     => extension_loaded( 'mbstring' ) ? 'Available' : 'Not available',
+			'OpenSSL'      => extension_loaded( 'openssl' ) ? OPENSSL_VERSION_TEXT : 'Not available',
 		);
 
 		return $info;
@@ -229,11 +229,11 @@ class System_Report {
 	protected static function get_theme_info() {
 		$theme = wp_get_theme();
 		$info  = array(
-			'Name'         => $theme->get( 'Name' ),
-			'Version'      => $theme->get( 'Version' ),
-			'Author'       => $theme->get( 'Author' ),
-			'Template'     => $theme->get_template(),
-			'Is Child'     => is_child_theme() ? 'Yes' : 'No',
+			'Name'     => $theme->get( 'Name' ),
+			'Version'  => $theme->get( 'Version' ),
+			'Author'   => $theme->get( 'Author' ),
+			'Template' => $theme->get_template(),
+			'Is Child' => is_child_theme() ? 'Yes' : 'No',
 		);
 
 		if ( is_child_theme() ) {
@@ -256,13 +256,13 @@ class System_Report {
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';
 		}
 
-		$active  = get_option( 'active_plugins', array() );
-		$all     = get_plugins();
+		$active = get_option( 'active_plugins', array() );
+		$all    = get_plugins();
 
 		foreach ( $active as $plugin_file ) {
 			if ( isset( $all[ $plugin_file ] ) ) {
-				$data = $all[ $plugin_file ];
-				$name = $data['Name'];
+				$data             = $all[ $plugin_file ];
+				$name             = $data['Name'];
 				$plugins[ $name ] = $data['Version'];
 			}
 		}
@@ -331,11 +331,11 @@ class System_Report {
 	protected static function get_media_info() {
 		global $wpdb;
 
-		$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = 'attachment'" );
+		$total  = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = 'attachment'" );
 		$images = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = 'attachment' AND post_mime_type LIKE 'image/%'" );
 		$videos = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = 'attachment' AND post_mime_type LIKE 'video/%'" );
 
-		$editor = _wp_image_editor_choose();
+		$editor      = _wp_image_editor_choose();
 		$editor_name = $editor ? ( new \ReflectionClass( $editor ) )->getShortName() : 'None';
 
 		$info = array(
@@ -357,9 +357,9 @@ class System_Report {
 	 */
 	protected static function get_constants_info() {
 		$constants = array(
-			'WP_CONTENT_DIR' => defined( 'WP_CONTENT_DIR' ) ? WP_CONTENT_DIR : '(not defined)',
-			'WP_CONTENT_URL' => defined( 'WP_CONTENT_URL' ) ? WP_CONTENT_URL : '(not defined)',
-			'UPLOADS'        => defined( 'UPLOADS' ) ? UPLOADS : '(not defined)',
+			'WP_CONTENT_DIR'      => defined( 'WP_CONTENT_DIR' ) ? WP_CONTENT_DIR : '(not defined)',
+			'WP_CONTENT_URL'      => defined( 'WP_CONTENT_URL' ) ? WP_CONTENT_URL : '(not defined)',
+			'UPLOADS'             => defined( 'UPLOADS' ) ? UPLOADS : '(not defined)',
 			'CONCATENATE_SCRIPTS' => defined( 'CONCATENATE_SCRIPTS' ) ? ( CONCATENATE_SCRIPTS ? 'true' : 'false' ) : '(not defined)',
 			'COMPRESS_SCRIPTS'    => defined( 'COMPRESS_SCRIPTS' ) ? ( COMPRESS_SCRIPTS ? 'true' : 'false' ) : '(not defined)',
 			'WP_AUTO_UPDATE_CORE' => defined( 'WP_AUTO_UPDATE_CORE' ) ? (string) WP_AUTO_UPDATE_CORE : '(not defined)',
@@ -378,11 +378,11 @@ class System_Report {
 		$upload_dir = wp_upload_dir();
 
 		$info = array(
-			'Filesystem Method' => get_filesystem_method(),
-			'Upload Dir'        => $upload_dir['basedir'],
-			'Upload URL'        => $upload_dir['baseurl'],
-			'Upload Writable'   => wp_is_writable( $upload_dir['basedir'] ) ? 'Yes' : 'No',
-			'Content Writable'  => wp_is_writable( WP_CONTENT_DIR ) ? 'Yes' : 'No',
+			'Filesystem Method'   => get_filesystem_method(),
+			'Upload Dir'          => $upload_dir['basedir'],
+			'Upload URL'          => $upload_dir['baseurl'],
+			'Upload Writable'     => wp_is_writable( $upload_dir['basedir'] ) ? 'Yes' : 'No',
+			'Content Writable'    => wp_is_writable( WP_CONTENT_DIR ) ? 'Yes' : 'No',
 			'Plugin Dir Writable' => wp_is_writable( WP_PLUGIN_DIR ) ? 'Yes' : 'No',
 		);
 

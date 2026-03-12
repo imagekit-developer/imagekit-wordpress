@@ -204,8 +204,8 @@ class Input extends Component {
 		if ( true === $this->setting->get_param( 'disabled', false ) ) {
 			$struct['attributes']['class'][] = 'ik-disabled-message';
 		}
-		$struct['attributes']['for']     = $this->setting->get_slug();
-		$struct['content']               = $this->setting->get_param( 'description' );
+		$struct['attributes']['for'] = $this->setting->get_slug();
+		$struct['content']           = $this->setting->get_param( 'description' );
 
 		return $struct;
 	}

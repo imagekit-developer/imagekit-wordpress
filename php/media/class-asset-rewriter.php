@@ -51,7 +51,7 @@ class Asset_Rewriter {
 		$this->base_url = is_string( $base_url ) ? rtrim( $base_url, '/' ) : '';
 		$this->site_url = rtrim( site_url(), '/' );
 
-		$parsed = wp_parse_url( $this->site_url, PHP_URL_PATH );
+		$parsed          = wp_parse_url( $this->site_url, PHP_URL_PATH );
 		$this->site_path = is_string( $parsed ) ? rtrim( $parsed, '/' ) : '';
 	}
 

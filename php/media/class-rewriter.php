@@ -38,9 +38,9 @@ class Rewriter {
 	protected $imagekit_folder;
 
 	public function __construct( Plugin $plugin, $settings, $base_url, $imagekit_folder ) {
-		$this->plugin         = $plugin;
-		$this->settings       = $settings;
-		$this->base_url       = is_string( $base_url ) ? (string) $base_url : '';
+		$this->plugin          = $plugin;
+		$this->settings        = $settings;
+		$this->base_url        = is_string( $base_url ) ? (string) $base_url : '';
 		$this->imagekit_folder = is_string( $imagekit_folder ) ? (string) $imagekit_folder : '';
 	}
 
@@ -257,9 +257,9 @@ class Rewriter {
 				$out[] = $part;
 				continue;
 			}
-			$url = $tokens[0];
+			$url  = $tokens[0];
 			$desc = isset( $tokens[1] ) ? trim( $tokens[1] ) : '';
-			$new = $this->rewrite_url( $url );
+			$new  = $this->rewrite_url( $url );
 			if ( ! is_string( $new ) || '' === $new ) {
 				$new = $url;
 			}
@@ -351,12 +351,12 @@ class Rewriter {
 			}
 		}
 		if ( is_int( $w ) && $w > 0 && is_int( $h ) && $h > 0 ) {
-			$dir      = dirname( $relative_clean );
-			$filename = basename( $relative_clean );
-			$ext      = pathinfo( $filename, PATHINFO_EXTENSION );
-			$base     = $ext ? substr( $filename, 0, -1 * ( strlen( $ext ) + 1 ) ) : $filename;
-			$sized    = $base . '-' . $w . 'x' . $h . ( $ext ? ( '.' . $ext ) : '' );
-			$sized_rel = ( '.' === $dir ) ? $sized : ( rtrim( $dir, '/' ) . '/' . $sized );
+			$dir        = dirname( $relative_clean );
+			$filename   = basename( $relative_clean );
+			$ext        = pathinfo( $filename, PATHINFO_EXTENSION );
+			$base       = $ext ? substr( $filename, 0, -1 * ( strlen( $ext ) + 1 ) ) : $filename;
+			$sized      = $base . '-' . $w . 'x' . $h . ( $ext ? ( '.' . $ext ) : '' );
+			$sized_rel  = ( '.' === $dir ) ? $sized : ( rtrim( $dir, '/' ) . '/' . $sized );
 			$sized_file = $basedir . '/' . ltrim( $sized_rel, '/' );
 			if ( '' !== $basedir && file_exists( $sized_file ) ) {
 				return $baseurl . '/' . ltrim( $sized_rel, '/' );
@@ -453,9 +453,9 @@ class Rewriter {
 	}
 
 	protected function apply_transforms( $url, $extra_transforms ) {
-		$transforms = apply_filters( 'imagekit_default_global_transformations_image', array() );
-		$transforms = is_array( $transforms ) ? array_map( 'trim', $transforms ) : array();
-		$transforms = array_filter(
+		$transforms       = apply_filters( 'imagekit_default_global_transformations_image', array() );
+		$transforms       = is_array( $transforms ) ? array_map( 'trim', $transforms ) : array();
+		$transforms       = array_filter(
 			$transforms,
 			static function ( $t ) {
 				return is_string( $t ) && '' !== $t;
@@ -468,7 +468,7 @@ class Rewriter {
 				return is_string( $t ) && '' !== $t;
 			}
 		);
-		$transforms = array_merge( $extra_transforms, $transforms );
+		$transforms       = array_merge( $extra_transforms, $transforms );
 
 		$existing_tr = '';
 		$existing_q  = wp_parse_url( $url, PHP_URL_QUERY );
