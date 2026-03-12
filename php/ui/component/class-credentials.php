@@ -175,6 +175,7 @@ class Credentials extends Component {
 
 	protected function intro( array $struct ) {
 		$struct['element'] = 'h3';
+		/* translators: %s: user display name */
 		$struct['content'] = sprintf( __( 'Hi %s', 'imagekit' ), $this->user_display_name );
 
 		return $struct;

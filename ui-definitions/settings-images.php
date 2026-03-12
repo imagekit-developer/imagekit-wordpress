@@ -48,6 +48,7 @@ $settings = array(
 						'default'        => '',
 						'anchor'         => true,
 						'tooltip_text'   => sprintf(
+							/* translators: %1$s: opening link tag, %2$s: closing link tag */
 							__(
 								'A set of additional transformations to apply to all images. Specify your transformations using ImageKit URL transformation syntax. See %1$sreference%2$s for all available transformations and syntax.',
 								'imagekit'

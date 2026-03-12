@@ -346,6 +346,7 @@ $settings = array(
 					},
 					'collapsible' => 'closed',
 					'content'     => sprintf(
+						/* translators: %1$s: opening bold tag, %2$s: opening link tag, %3$s: closing link tag, %4$s: closing bold tag */
 						__( 'To use the ImageKit plugin and all the functionality that comes with it, you will need to have a ImageKit Account. %1$sIf you don\'t have an account yet, %2$ssign up%3$s now for a free ImageKit account%4$s. You\'ll start with generous usage limits and when your requirements grow, you can easily upgrade to a plan that best fits your needs.', 'imagekit' ),
 						'<b>',
 						'<a href="https://imagekit.io/registration/" target="_blank" rel="noopener noreferrer">',

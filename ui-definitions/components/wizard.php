@@ -51,6 +51,7 @@ $imagekit->add_script_data( 'wizard', $data );
 				$current_user = wp_get_current_user();
 				$display_name = ! empty( $current_user->display_name ) ? $current_user->display_name : __( 'there', 'imagekit' );
 				printf(
+					/* translators: %s: user display name */
 					esc_html__( 'Welcome aboard, %s', 'imagekit' ),
 					esc_html( $display_name )
 				);
@@ -136,6 +137,7 @@ $imagekit->add_script_data( 'wizard', $data );
 									<?php
 									echo wp_kses_post(
 										sprintf(
+											/* translators: %s: URL to ImageKit external storage dashboard */
 											__( 'Go to the <a href="%s" target="_blank" rel="noopener noreferrer">external storage section</a> in your ImageKit dashboard. Under the Origins section, click on the Add origin button.', 'imagekit' ),
 											esc_url( 'https://imagekit.io/dashboard/external-storage' )
 										)
@@ -146,6 +148,7 @@ $imagekit->add_script_data( 'wizard', $data );
 									<?php
 									echo wp_kses_post(
 										sprintf(
+											/* translators: %s: URL to web server origin documentation */
 											__( 'Choose <a href="%s" target="_blank" rel="noopener noreferrer">Web server</a> from the origin type dropdown.', 'imagekit' ),
 											esc_url( 'https://docs.imagekit.io/integration/configure-origin/web-server-origin' )
 										)
@@ -157,6 +160,7 @@ $imagekit->add_script_data( 'wizard', $data );
 									<?php
 									echo wp_kses_post(
 										sprintf(
+											/* translators: %s: WordPress site URL */
 											__( 'Fill out the base URL as your WordPress site URL: <code>%s</code>', 'imagekit' ),
 											esc_html( home_url( '/' ) )
 										)
@@ -167,6 +171,7 @@ $imagekit->add_script_data( 'wizard', $data );
 									<?php
 									echo wp_kses_post(
 										sprintf(
+											/* translators: %s: URL to advanced options documentation */
 											__( 'To configure advanced options, refer <a href="%s" target="_blank" rel="noopener noreferrer">here</a>.', 'imagekit' ),
 											esc_url( 'https://docs.imagekit.io/integration/configure-origin/web-server-origin#advanced-options-for-web-server-origin' )
 										)
@@ -234,6 +239,7 @@ $imagekit->add_script_data( 'wizard', $data );
 									<?php
 									echo wp_kses_post(
 										sprintf(
+											/* translators: %s: URL to ImageKit developer dashboard */
 											__( 'Enter the URL endpoint, public key, and private key from your ImageKit dashboard. You can find these in your ImageKit dashboard under the <a href="%s" target="_blank" rel="noopener noreferrer">Developer section</a>.', 'imagekit' ),
 											esc_url( 'https://imagekit.io/dashboard/developer/api-keys' )
 										)

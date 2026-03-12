@@ -360,6 +360,7 @@ class Credentials_Manager extends Settings_Component implements Config, Setup {
 			$result['message'] = __( 'Validation failed', 'imagekit' );
 
 			$result['fieldErrors']['urlEndpoint'] = sprintf(
+				/* translators: %s: expected URL format */
 				__( 'Incorrect Format. Expecting: %s', 'imagekit' ),
 				'https://ik.imagekit.io/imagekit_id'
 			);
@@ -380,6 +381,7 @@ class Credentials_Manager extends Settings_Component implements Config, Setup {
 			$result['code']                     = 'invalid_public_key';
 			$result['message']                  = __( 'Validation failed', 'imagekit' );
 			$result['fieldErrors']['publicKey'] = sprintf(
+				/* translators: %s: expected public key format */
 				__( 'Incorrect Public key. Expecting %s', 'imagekit' ),
 				'public_XXXXXXXXXXXXXX'
 			);
@@ -392,6 +394,7 @@ class Credentials_Manager extends Settings_Component implements Config, Setup {
 			$result['code']                      = 'invalid_private_key';
 			$result['message']                   = __( 'Validation failed', 'imagekit' );
 			$result['fieldErrors']['privateKey'] = sprintf(
+				/* translators: %s: expected private key format */
 				__( 'Incorrect Private key. Expecting %s', 'imagekit' ),
 				'private_XXXXXXXXXXXXXX'
 			);
