@@ -66,5 +66,17 @@
 		&-extension-units::before {
 			content: "\e903";
 		}
+
+		&-report::before {
+			content: "\e909"
+		}
+
+		&-support::before {
+			content: "\e90a"
+		}
+
+		&-community::before {
+			content: "\e90b"
+		}
 	}
 }

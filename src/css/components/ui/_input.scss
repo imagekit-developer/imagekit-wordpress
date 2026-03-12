@@ -88,6 +88,10 @@
 		margin: 0;
 	}
 
+	label.description.ik-disabled-message {
+		color: $color-red;
+	}
+
 	.ik-input-label .ik-input,
 	.ik-input-label .ik-select {
 		font-size: 14px;

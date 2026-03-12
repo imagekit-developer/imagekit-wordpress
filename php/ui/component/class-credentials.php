@@ -26,9 +26,9 @@ class Credentials extends Component {
 	protected $blueprint = 'wrap|status_header|status_icon/|status_text|intro/|message/|/status_text|status_actions|reconfigure/|disconnect/|/status_actions|/status_header|credentials_section|credentials_title/|credentials_list|credential_row_id/|credential_row_public/|credential_row_private/|/credentials_list|/credentials_section|/wrap';
 
 	/**
-	 * Holder the Connect object.
+	 * Holder the Credentials manager object.
 	 *
-	 * @var Connect
+	 * @var \ImageKitWordpress\Credentials_Manager
 	 */
 	protected $connect;
 
@@ -182,7 +182,13 @@ class Credentials extends Component {
 
 	protected function message( array $struct ) {
 		$struct['element'] = 'p';
-		$struct['content'] = __( 'Your ImageKit integration is configured.', 'imagekit' );
+		if ( '' !== $this->url_endpoint && ( '' === $this->public_key || '' === $this->private_key ) ) {
+			$struct['content'] = __( 'Your ImageKit URL endpoint is configured. Add your API keys to enable uploads and usage stats.', 'imagekit' );
+		} elseif ( '' !== $this->url_endpoint ) {
+			$struct['content'] = __( 'Your ImageKit integration is configured.', 'imagekit' );
+		} else {
+			$struct['content'] = __( 'Your ImageKit integration is not configured.', 'imagekit' );
+		}
 
 		return $struct;
 	}

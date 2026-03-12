@@ -4022,6 +4022,10 @@ class Wizard {
       ),
     };
 
+    this.deliverImages = context.querySelector("#ik_wizard_deliver_images");
+    this.deliverVideos = context.querySelector("#ik_wizard_deliver_videos");
+    this.deliverAssets = context.querySelector("#ik_wizard_deliver_assets");
+
     this._bind();
     this._prefillFromData();
     this.goTo(this.currentStep, { focusPanel: false });
@@ -4103,6 +4107,19 @@ class Wizard {
         });
       });
 
+    if (this.deliverAssets) {
+      this.deliverAssets.addEventListener("change", () => {
+        if (this.deliverAssets.checked) {
+          if (this.deliverImages) {
+            this.deliverImages.checked = true;
+          }
+          if (this.deliverVideos) {
+            this.deliverVideos.checked = true;
+          }
+        }
+      });
+    }
+
     if (this.buttonBack) {
       this.buttonBack.addEventListener("click", (ev) => {
         ev.preventDefault();
@@ -4149,9 +4166,7 @@ class Wizard {
     const error = this.step2ErrorEl;
 
     const urlOk = url && url.value && url.value.trim().length > 0;
-    const pubOk = pub && pub.value && pub.value.trim().length > 0;
-    const privOk = priv && priv.value && priv.value.trim().length > 0;
-    const ok = urlOk && pubOk && privOk;
+    const ok = urlOk;
 
     if (error) {
       if (!ok) {
@@ -4220,6 +4235,24 @@ class Wizard {
     );
   }
 
+  _hasStep2Endpoint(payload) {
+    return !!(
+      payload &&
+      payload.urlEndpoint &&
+      payload.urlEndpoint.trim().length > 0
+    );
+  }
+
+  _hasStep2Keys(payload) {
+    return !!(
+      payload &&
+      payload.publicKey &&
+      payload.publicKey.trim().length > 0 &&
+      payload.privateKey &&
+      payload.privateKey.trim().length > 0
+    );
+  }
+
   _onStep2InputChange() {
     if (this.currentStep !== 2) {
       return;
@@ -4233,13 +4266,20 @@ class Wizard {
       this.step2DebounceTimer = null;
     }
 
-    if (!this._areStep2FieldsFilled()) {
+    const payload = this._getWizardPayload();
+    if (!this._hasStep2Endpoint(payload)) {
       this._setStep2Error(null);
       this._clearStep2FieldErrors();
       return;
     }
 
-    const payload = this._getWizardPayload();
+    // Only auto-test when both keys are provided.
+    if (!this._hasStep2Keys(payload)) {
+      this._setStep2Error(null);
+      this._clearStep2FieldErrors();
+      return;
+    }
+
     const expectedKey = this._getWizardPayloadKey(payload);
     this.step2DebounceTimer = setTimeout(async () => {
       await this._testConnectionDebounced(expectedKey);
@@ -4342,6 +4382,9 @@ class Wizard {
       urlEndpoint: urlEndpointInput ? urlEndpointInput.value.trim() : "",
       publicKey: publicKeyInput ? publicKeyInput.value.trim() : "",
       privateKey: privateKeyInput ? privateKeyInput.value.trim() : "",
+      deliverImages: this.deliverImages ? this.deliverImages.checked : true,
+      deliverVideos: this.deliverVideos ? this.deliverVideos.checked : true,
+      deliverAssets: this.deliverAssets ? this.deliverAssets.checked : true,
     };
   }
 
@@ -4363,6 +4406,16 @@ class Wizard {
     }
 
     try {
+      const payload = this._getWizardPayload();
+
+      // Endpoint-only setup: skip connection test.
+      if (this._hasStep2Endpoint(payload) && !this._hasStep2Keys(payload)) {
+        this._clearStep2FieldErrors();
+        this._setStep2Error(null);
+        this.goTo(3);
+        return;
+      }
+
       const result = await this._postTestConnection();
       if (this._isTestConnectionSuccess(result)) {
         this._clearStep2FieldErrors();
@@ -4402,6 +4455,15 @@ class Wizard {
 
     this._ensureNonceMiddleware(data);
     const payload = this._getWizardPayload();
+
+    if (this._hasStep2Endpoint(payload) && !this._hasStep2Keys(payload)) {
+      return {
+        ok: true,
+        code: "endpoint_only",
+        message: null,
+        fieldErrors: {},
+      };
+    }
 
     try {
       return await build_module({

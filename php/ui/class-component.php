@@ -710,6 +710,15 @@ abstract class Component {
 		if ( $this->setting->has_settings() ) {
 			$html = array();
 			foreach ( $this->setting->get_settings() as $setting ) {
+				if ( $setting->has_param( 'enabled' ) ) {
+					$enabled = $setting->get_param( 'enabled' );
+					if ( is_callable( $enabled ) && ! call_user_func( $enabled ) ) {
+						continue;
+					}
+					if ( false === $enabled ) {
+						continue;
+					}
+				}
 				$html[] = $setting->get_component()->render();
 			}
 			$struct['content'] = self::compile_html( $html );

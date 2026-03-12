@@ -46,6 +46,9 @@ class Utils {
 		return apply_filters( 'imagekit_rest_url', $rest_url, $path, $scheme );
 	}
 
+	public static function install( $previous_version = null, $new_version = null ) {
+	}
+
 	/**
 	 * Check if the current user can perform a task.
 	 *

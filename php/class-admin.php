@@ -143,7 +143,7 @@ class Admin {
 			if ( empty( $sub_page ) ) {
 				continue;
 			}
-			if ( ! empty( $sub_page['requires_connection'] ) && empty( $connected ) ) {
+			if ( ! empty( $sub_page['requires_connection'] ) && false === $connected ) {
 				continue;
 			}
 			$render_slug = $page['slug'] . '_' . $slug;
@@ -159,7 +159,7 @@ class Admin {
 			$page_title = ! empty( $sub_page['page_title'] ) ? $sub_page['page_title'] : $page['page_title'];
 			$menu_title = ! empty( $sub_page['menu_title'] ) ? $sub_page['menu_title'] : $page_title;
 			$position   = ! empty( $sub_page['position'] ) ? $sub_page['position'] : 50;
-			if ( isset( $sub_page['disconnected_title'] ) && ! $this->settings->get_param( 'connected' ) ) {
+			if ( isset( $sub_page['disconnected_title'] ) && true !== $this->settings->get_param( 'connected' ) ) {
 				$page_title = $sub_page['disconnected_title'];
 				$menu_title = $sub_page['disconnected_title'];
 			}
@@ -196,7 +196,9 @@ class Admin {
 				$this->section = $section;
 				$this->set_param( 'current_section', $this->get_param( $section ) );
 			}
-			if ( 'page' === $this->section && ! $this->settings->get_param( 'connected' ) && 'help' !== $page['slug'] ) {
+			$url_endpoint = $this->settings->get_value( 'credentials.url_endpoint' );
+			$url_endpoint = is_string( $url_endpoint ) ? trim( $url_endpoint ) : '';
+			if ( 'page' === $this->section && '' === $url_endpoint && 'help' !== $page['slug'] ) {
 				$args = array(
 					'page'    => $this->plugin->slug,
 					'section' => 'wizard',
@@ -244,7 +246,9 @@ class Admin {
 	 * @return Settings\Setting|null
 	 */
 	public function init_components( $template, $slug ) {
-		if ( ! empty( $template['requires_connection'] ) && ! $this->settings->get_param( 'connected' ) ) {
+		$url_endpoint = $this->settings->get_value( 'credentials.url_endpoint' );
+		$url_endpoint = is_string( $url_endpoint ) ? trim( $url_endpoint ) : '';
+		if ( ! empty( $template['requires_connection'] ) && '' === $url_endpoint ) {
 			return null;
 		}
 		$setting = $this->settings->add( $slug, array(), $template );

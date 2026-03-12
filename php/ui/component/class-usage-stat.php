@@ -10,7 +10,7 @@ class Usage_Stat extends Component {
 	/**
 	 * Holds the connect instance.
 	 *
-	 * @var Connect
+	 * @var \ImageKitWordpress\Credentials_Manager
 	 */
 	protected $connect;
 

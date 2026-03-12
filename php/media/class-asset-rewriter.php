@@ -58,16 +58,31 @@ class Asset_Rewriter {
 	/**
 	 * Register WordPress hooks.
 	 */
-	public function setup() {
+	public function setup() {}
+
+	public function rewrite_html( $html ) {
+		if ( ! is_string( $html ) || '' === $html ) {
+			return $html;
+		}
 		if ( '' === $this->base_url ) {
-			return;
+			return $html;
 		}
 		if ( ! $this->delivery->has_any_asset_delivery_enabled() ) {
-			return;
+			return $html;
+		}
+		if ( false === strpos( $html, '<script' ) && false === strpos( $html, '<link' ) ) {
+			return $html;
+		}
+		$looks_like_full_document = ( false !== stripos( $html, '<!doctype' ) ) || ( false !== stripos( $html, '<html' ) );
+
+		if ( ! $looks_like_full_document && class_exists( '\DOMDocument' ) ) {
+			$rewritten = $this->rewrite_html_with_dom( $html );
+			if ( is_string( $rewritten ) && '' !== $rewritten ) {
+				return $rewritten;
+			}
 		}
 
-		add_filter( 'style_loader_src', array( $this, 'rewrite_style_src' ), 20, 2 );
-		add_filter( 'script_loader_src', array( $this, 'rewrite_script_src' ), 20, 2 );
+		return $this->rewrite_html_with_regex( $html );
 	}
 
 	/**
@@ -144,6 +159,9 @@ class Asset_Rewriter {
 
 		$path = wp_parse_url( $url, PHP_URL_PATH );
 		$path = is_string( $path ) ? $path : '';
+		if ( '' !== $path && '/' !== $path[0] ) {
+			$path = '/' . $path;
+		}
 
 		// Strip the site sub-directory prefix if present.
 		if ( '' !== $this->site_path && 0 === strpos( $path, $this->site_path ) ) {
@@ -171,8 +189,8 @@ class Asset_Rewriter {
 	 * @return bool
 	 */
 	protected function is_local_url( $url ) {
-		// Protocol-relative or relative URLs are local.
-		if ( 0 === strpos( $url, '/' ) && 0 !== strpos( $url, '//' ) ) {
+		// Relative URLs are local.
+		if ( ! preg_match( '#^[a-zA-Z][a-zA-Z0-9+.-]*:#', $url ) && 0 !== strpos( $url, '//' ) ) {
 			return true;
 		}
 		$url_host  = wp_parse_url( $url, PHP_URL_HOST );
@@ -202,6 +220,9 @@ class Asset_Rewriter {
 		}
 
 		$path = $parsed['path'];
+		if ( is_string( $path ) && '' !== $path && '/' !== $path[0] ) {
+			$path = '/' . $path;
+		}
 
 		// Strip site sub-directory prefix so the ImageKit path starts at the WP root.
 		if ( '' !== $this->site_path && 0 === strpos( $path, $this->site_path ) ) {
@@ -216,5 +237,118 @@ class Asset_Rewriter {
 		}
 
 		return $new_url;
+	}
+
+	protected function rewrite_html_with_dom( $html ) {
+		libxml_use_internal_errors( true );
+		$doc    = new \DOMDocument();
+		$loaded = $doc->loadHTML( '<?xml encoding="utf-8" ?>' . $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
+		if ( ! $loaded ) {
+			libxml_clear_errors();
+			return null;
+		}
+
+		$links = $doc->getElementsByTagName( 'link' );
+		for ( $i = $links->length - 1; $i >= 0; $i-- ) {
+			$link = $links->item( $i );
+			if ( ! $link || ! $link->hasAttribute( 'href' ) ) {
+				continue;
+			}
+			$rel = $link->hasAttribute( 'rel' ) ? strtolower( (string) $link->getAttribute( 'rel' ) ) : '';
+			$as  = $link->hasAttribute( 'as' ) ? strtolower( (string) $link->getAttribute( 'as' ) ) : '';
+			if ( false === strpos( $rel, 'stylesheet' ) && ! ( 'preload' === $rel && 'style' === $as ) ) {
+				continue;
+			}
+			$old = (string) $link->getAttribute( 'href' );
+			$new = $this->maybe_rewrite_asset_url( $old, 'style', '' );
+			if ( is_string( $new ) && '' !== $new && $new !== $old ) {
+				$link->setAttribute( 'href', $new );
+			}
+		}
+
+		$scripts = $doc->getElementsByTagName( 'script' );
+		for ( $i = $scripts->length - 1; $i >= 0; $i-- ) {
+			$script = $scripts->item( $i );
+			if ( ! $script || ! $script->hasAttribute( 'src' ) ) {
+				continue;
+			}
+			$old = (string) $script->getAttribute( 'src' );
+			$new = $this->maybe_rewrite_asset_url( $old, 'script', '' );
+			if ( is_string( $new ) && '' !== $new && $new !== $old ) {
+				$script->setAttribute( 'src', $new );
+			}
+		}
+
+		$out = $doc->saveHTML();
+		libxml_clear_errors();
+
+		return is_string( $out ) ? $out : null;
+	}
+
+	protected function rewrite_html_with_regex( $html ) {
+		$self = $this;
+		$html = preg_replace_callback(
+			'#<link\b[^>]*>#i',
+			static function ( $m ) use ( $self ) {
+				$tag = $m[0];
+				if ( ! preg_match( '#\brel\s*=\s*(["\'])\s*([^"\']+)\s*\1#i', $tag, $relm ) ) {
+					return $tag;
+				}
+				$rel = strtolower( trim( (string) $relm[2] ) );
+				$as  = '';
+				if ( preg_match( '#\bas\s*=\s*(["\'])\s*([^"\']+)\s*\1#i', $tag, $asm ) ) {
+					$as = strtolower( trim( (string) $asm[2] ) );
+				}
+				if ( false === strpos( $rel, 'stylesheet' ) && ! ( 'preload' === $rel && 'style' === $as ) ) {
+					return $tag;
+				}
+				return $self->rewrite_tag_attr( $tag, 'href', 'style' );
+			},
+			$html
+		);
+
+		return preg_replace_callback(
+			'#<script\b[^>]*>#i',
+			static function ( $m ) use ( $self ) {
+				$tag = $m[0];
+				return $self->rewrite_tag_attr( $tag, 'src', 'script' );
+			},
+			$html
+		);
+	}
+
+	protected function rewrite_tag_attr( $tag, $attr, $type ) {
+		$pattern = '#\b' . preg_quote( $attr, '#' ) . '\s*=\s*(["\'])\s*([^"\']+)\s*\1#i';
+		return preg_replace_callback(
+			$pattern,
+			function ( $m ) use ( $attr, $type ) {
+				$q   = $m[1];
+				$url = $m[2];
+				$new = $this->maybe_rewrite_asset_url( $url, $type, '' );
+				if ( ! is_string( $new ) || '' === $new ) {
+					return $m[0];
+				}
+				return $attr . '=' . $q . $new . $q;
+			},
+			$tag
+		);
+	}
+
+	protected function maybe_rewrite_asset_url( $url, $type, $handle ) {
+		if ( ! is_string( $url ) || '' === $url ) {
+			return $url;
+		}
+		if ( apply_filters( 'imagekit_exclude_asset_url', false, $url, $handle, $type ) ) {
+			return $url;
+		}
+		$category = $this->classify_url( $url );
+		if ( '' === $category ) {
+			return $url;
+		}
+		$key = $category . ( 'style' === $type ? '_css' : '_js' );
+		if ( ! $this->delivery->is_asset_delivery_enabled( $key ) ) {
+			return $url;
+		}
+		return $this->rewrite_url( $url );
 	}
 }

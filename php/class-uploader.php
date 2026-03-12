@@ -48,7 +48,7 @@ class Uploader extends Settings_Component implements Setup, Assets {
 	}
 
 	function enqueue_assets() {
-		if ( isset( $this->plugin->settings ) && $this->plugin->settings->get_param( 'connected' ) ) {
+		if ( isset( $this->plugin->settings ) && true === $this->plugin->settings->get_param( 'connected' ) ) {
 			$data = array(
 				'restUrl' => esc_url_raw( Utils::rest_url() ),
 				'nonce'   => wp_create_nonce( 'wp_rest' ),
@@ -78,7 +78,7 @@ class Uploader extends Settings_Component implements Setup, Assets {
 		}
 
 		// Only offload when the plugin is connected.
-		if ( ! isset( $this->plugin->settings ) || ! $this->plugin->settings->get_param( 'connected' ) ) {
+		if ( ! isset( $this->plugin->settings ) || true !== $this->plugin->settings->get_param( 'connected' ) ) {
 			return;
 		}
 		if ( 'wp_high_ik_none' === $this->get_offload_mode() ) {
@@ -129,7 +129,7 @@ class Uploader extends Settings_Component implements Setup, Assets {
 		if ( empty( $attachment_id ) ) {
 			return false;
 		}
-		if ( ! isset( $this->plugin->settings ) || ! $this->plugin->settings->get_param( 'connected' ) ) {
+		if ( ! isset( $this->plugin->settings ) || true !== $this->plugin->settings->get_param( 'connected' ) ) {
 			return false;
 		}
 		if ( 'wp_high_ik_none' === $this->get_offload_mode() ) {
@@ -393,6 +393,20 @@ class Uploader extends Settings_Component implements Setup, Assets {
 	 * @return array
 	 */
 	public function settings( $pages ) {
+		$credentials_manager = $this->plugin->get_component( 'credentials_manager' );
+		$is_disabled         = true;
+		if ( $credentials_manager && $credentials_manager->get_settings() ) {
+			$is_disabled = true !== $credentials_manager->get_connection_state();
+		} else {
+			$credentials = get_option( 'imagekit_credentials', array() );
+			$credentials = is_array( $credentials ) ? $credentials : array();
+			$public_key  = isset( $credentials['public_key'] ) && is_string( $credentials['public_key'] ) ? trim( $credentials['public_key'] ) : '';
+			$private_key = isset( $credentials['private_key'] ) && is_string( $credentials['private_key'] ) ? trim( $credentials['private_key'] ) : '';
+			$url         = isset( $credentials['url_endpoint'] ) && is_string( $credentials['url_endpoint'] ) ? trim( $credentials['url_endpoint'] ) : '';
+			$is_disabled = '' === $url || '' === $public_key || '' === $private_key;
+		}
+		$disabled_msg = __( 'Configure API Keys to enable uploads.', 'imagekit' );
+
 		$pages['credentials']['settings'][] = array(
 			array(
 				'type'                => 'frame',
@@ -406,6 +420,8 @@ class Uploader extends Settings_Component implements Setup, Assets {
 						'type'              => 'input',
 						'slug'              => 'imagekit_folder',
 						'title'             => __( 'ImageKit folder path', 'imagekit' ),
+						'disabled'          => $is_disabled,
+						'description'       => $is_disabled ? $disabled_msg : null,
 						'default'           => '',
 						'attributes'        => array(
 							'input' => array(
@@ -422,6 +438,8 @@ class Uploader extends Settings_Component implements Setup, Assets {
 						'type'         => 'select',
 						'slug'         => 'offload',
 						'title'        => __( 'Storage', 'imagekit' ),
+						'disabled'     => $is_disabled,
+						'description'  => $is_disabled ? $disabled_msg : null,
 						'tooltip_text' => sprintf(
 							// translators: the HTML for opening and closing list and its items.
 							__(

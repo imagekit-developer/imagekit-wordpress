@@ -197,14 +197,14 @@ final class Plugin {
 		);
 		$this->init_component_settings( $components );
 
-		$connection = $this->get_component( 'credentials_manager' )->is_connected();
-		if ( false === $connection ) {
+		$connection_state = $this->get_component( 'credentials_manager' )->get_connection_state();
+		$this->settings->set_param( 'connected', $connection_state );
+		if ( true !== $connection_state ) {
 			$count      = sprintf( ' <span class="update-plugins count-%d"><span class="update-count">%d</span></span>', 1, number_format_i18n( 1 ) );
 			$main_title = $this->settings->get_param( 'menu_title' ) . $count;
 			$this->settings->set_param( 'menu_title', $main_title );
 			$this->settings->set_param( 'connect_count', $count );
 		} else {
-			$this->settings->set_param( 'connected', true );
 			do_action( 'imagekit_connected', $this );
 		}
 
@@ -221,6 +221,9 @@ final class Plugin {
 		 */
 	private function init_component_settings( $components ) {
 		$version = get_option( Credentials_Manager::META_KEYS['version'] );
+		if ( empty( $version ) || ! is_string( $version ) ) {
+			$version = '0.0.0';
+		}
 		foreach ( $components as $slug => $component ) {
 			/**
 			 * Component that implements Settings.
@@ -230,12 +233,12 @@ final class Plugin {
 			$component->init_settings( $this->settings );
 
 			// Upgrade settings if needed.
-			if ( $version < $this->version ) {
+			if ( version_compare( $version, $this->version, '<' ) ) {
 				$component->upgrade_settings( $version, $this->version );
 			}
 		}
 		// Update settings version, if needed.
-		if ( $version < $this->version ) {
+		if ( version_compare( $version, $this->version, '<' ) ) {
 			update_option( Credentials_Manager::META_KEYS['version'], $this->version );
 		}
 	}
@@ -334,19 +337,17 @@ final class Plugin {
 	public function setup() {
 		$this->setup_settings();
 
-		if ( $this->settings->get_param( 'connected' ) ) {
-			/**
-			 * Component that implements Component\Setup.
-			 *
-			 * @var  Component\Setup $component
-			 */
-			foreach ( $this->components as $key => $component ) {
-				if ( ! $component instanceof Settings_Component ) {
-					continue;
-				}
-
-				$component->setup();
+		/**
+		 * Component that implements Component\Setup.
+		 *
+		 * @var  Component\Setup $component
+		 */
+		foreach ( $this->components as $key => $component ) {
+			if ( ! $component instanceof Settings_Component ) {
+				continue;
 			}
+
+			$component->setup();
 		}
 
 		do_action( 'imagekit_ready', $this );

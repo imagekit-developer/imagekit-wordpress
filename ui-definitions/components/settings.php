@@ -22,8 +22,13 @@ $active_slug = $admin->get_param( 'active_slug' );
 			$component->render( true );
 			?>
 		</div>
-		<?php if ( ! empty( $connected ) && ! empty( $page['sidebar'] ) ) : ?>
+		<?php if ( false !== $connected && ! empty( $page['sidebar'] ) ) : ?>
 			<div class="ik-column ik-ui-sidebar">
+				<?php if ( 'partial' === $connected ) : ?>
+					<div class="notice notice-warning">
+						<p><?php esc_html_e( 'Configure API Keys to view usage', 'imagekit' ); ?></p>
+					</div>
+				<?php endif; ?>
 				<?php
 				$def     = $imagekit->settings->get_param( 'sidebar' );
 				$sidebar = $this->init_components( $def, 'sidebar' );

@@ -98,10 +98,15 @@ $imagekit->add_script_data( 'wizard', $data );
 									<?php esc_html_e( 'Deliver fast, optimized media on every page', 'imagekit' ); ?>
 								</h4>
 								<p class="ik-wizard-copy-text">
-									<?php esc_html_e( 'ImageKit helps you automatically optimize and deliver images and videos with built-in transformations, CDN delivery, and modern formats—so your site stays fast without extra effort.', 'imagekit' ); ?>
+									<?php esc_html_e( 'ImageKit helps you automatically optimize and deliver images and videos with built-in transformations, CDN delivery, and modern formats - so your site stays fast without extra effort.', 'imagekit' ); ?>
 								</p>
+								<ul class="ik-wizard-copy-list">
+									<li><?php esc_html_e( 'Serve images in next-gen formats like WebP and AVIF', 'imagekit' ); ?></li>
+									<li><?php esc_html_e( 'Optimize images automatically on delivery', 'imagekit' ); ?></li>
+									<li><?php esc_html_e( 'Keep your original WordPress media untouched', 'imagekit' ); ?></li>
+								</ul>
 								<p class="ik-wizard-copy-text">
-									<?php esc_html_e( 'This is placeholder text for now and will be replaced later.', 'imagekit' ); ?>
+									<?php esc_html_e( 'Next, connect your ImageKit account to start optimizing your media.', 'imagekit' ); ?>
 								</p>
 							</div>
 
@@ -178,7 +183,7 @@ $imagekit->add_script_data( 'wizard', $data );
 					<div class="ik-wizard-field">
 						<div class="ik-wizard-connect-form">
 								<p class="ik-wizard-error" data-wizard-error="step2" role="alert" hidden="hidden">
-									<?php esc_html_e( 'Please fill out the URL endpoint, public key, and private key to continue.', 'imagekit' ); ?>
+									<?php esc_html_e( 'Please fill out the URL endpoint to continue.', 'imagekit' ); ?>
 								</p>
 								<div class="ik-wizard-input-group">
 									<label class="ik-wizard-input-label" for="ik_wizard_url_endpoint">
@@ -245,8 +250,43 @@ $imagekit->add_script_data( 'wizard', $data );
 							<?php esc_html_e( 'Recommended settings', 'imagekit' ); ?>
 						</h3>
 						<p class="ik-wizard-copy-text">
-							<?php esc_html_e( 'We\'ll suggest a few recommended settings based on your site. Placeholder content for now.', 'imagekit' ); ?>
+							<?php esc_html_e( 'Choose what you\'d like to deliver through ImageKit. You can always change these later in the plugin settings.', 'imagekit' ); ?>
 						</p>
+					</div>
+
+					<div class="ik-wizard-toggles">
+						<label class="ik-wizard-toggle" for="ik_wizard_deliver_images">
+							<div class="ik-wizard-toggle-info">
+								<span class="ik-wizard-toggle-title"><?php esc_html_e( 'Images', 'imagekit' ); ?></span>
+								<span class="ik-wizard-toggle-desc"><?php esc_html_e( 'Optimize and deliver images via ImageKit CDN with automatic format conversion.', 'imagekit' ); ?></span>
+							</div>
+							<span class="ik-wizard-toggle-switch">
+								<input type="checkbox" id="ik_wizard_deliver_images" name="ik_wizard_deliver_images" value="on" checked />
+								<span class="ik-wizard-toggle-slider"></span>
+							</span>
+						</label>
+
+						<label class="ik-wizard-toggle" for="ik_wizard_deliver_videos">
+							<div class="ik-wizard-toggle-info">
+								<span class="ik-wizard-toggle-title"><?php esc_html_e( 'Videos', 'imagekit' ); ?></span>
+								<span class="ik-wizard-toggle-desc"><?php esc_html_e( 'Deliver videos through ImageKit for faster playback and adaptive streaming.', 'imagekit' ); ?></span>
+							</div>
+							<span class="ik-wizard-toggle-switch">
+								<input type="checkbox" id="ik_wizard_deliver_videos" name="ik_wizard_deliver_videos" value="on" checked />
+								<span class="ik-wizard-toggle-slider"></span>
+							</span>
+						</label>
+
+						<label class="ik-wizard-toggle" for="ik_wizard_deliver_assets">
+							<div class="ik-wizard-toggle-info">
+								<span class="ik-wizard-toggle-title"><?php esc_html_e( 'Assets', 'imagekit' ); ?></span>
+								<span class="ik-wizard-toggle-desc"><?php esc_html_e( 'Deliver theme, plugin, and WordPress core CSS & JS files via ImageKit.', 'imagekit' ); ?></span>
+							</div>
+							<span class="ik-wizard-toggle-switch">
+								<input type="checkbox" id="ik_wizard_deliver_assets" name="ik_wizard_deliver_assets" value="on" checked />
+								<span class="ik-wizard-toggle-slider"></span>
+							</span>
+						</label>
 					</div>
 				</section>
 
@@ -257,9 +297,6 @@ $imagekit->add_script_data( 'wizard', $data );
 						</h3>
 						<p class="ik-wizard-copy-text">
 							<?php esc_html_e( 'You have successfully set up the ImageKit plugin for your site, your media assets will now be optimized and delivered via fast CDN. To further configure the plugin, take a look at the various settings available.', 'imagekit' ); ?>
-						</p>
-						<p class="ik-wizard-copy-text">
-							<?php esc_html_e( 'Once your assets have finished syncing, the plugin dashboard will show the impact on performance for your site.', 'imagekit' ); ?>
 						</p>
 					</div>
 				</section>

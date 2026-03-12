@@ -70,6 +70,11 @@ class Credentials_Manager extends Settings_Component implements Config, Setup {
 	);
 
 	/**
+	 * Legacy option name used by v4.x and earlier.
+	 */
+	const LEGACY_OPTION = 'imagekit_settings';
+
+	/**
 	 * Initiate the plugin resources.
 	 *
 	 * @param \ImageKitWordpress\Plugin $plugin Instance of the plugin.
@@ -180,7 +185,24 @@ class Credentials_Manager extends Settings_Component implements Config, Setup {
 
 		$this->settings->save();
 
-		$this->plugin->settings->set_param( 'connected', true );
+		// Save delivery settings from wizard toggles.
+		$deliver_images = $request->get_param( 'deliverImages' ) ? 'on' : 'off';
+		$deliver_videos = $request->get_param( 'deliverVideos' ) ? 'on' : 'off';
+		$deliver_assets = $request->get_param( 'deliverAssets' ) ? 'on' : 'off';
+
+		$main_settings = $this->plugin->settings;
+
+		$main_settings->set_pending( 'media_display.image_delivery', $deliver_images );
+		$main_settings->set_pending( 'media_display.video_delivery', $deliver_videos );
+
+		$asset_keys = array( 'theme_css', 'theme_js', 'plugin_css', 'plugin_js', 'wp_core_css', 'wp_core_js' );
+		foreach ( $asset_keys as $key ) {
+			$main_settings->set_pending( 'asset_delivery.' . $key, $deliver_assets );
+		}
+
+		$main_settings->save();
+
+		$this->plugin->settings->set_param( 'connected', $this->get_connection_state() );
 
 		return rest_ensure_response( $this->settings->get_value() );
 	}
@@ -210,24 +232,92 @@ class Credentials_Manager extends Settings_Component implements Config, Setup {
 	}
 
 	/**
+	 * Attempt migration of legacy v4.x settings stored under `imagekit_settings`.
+	 *
+	 * Old versions did not store public/private keys, but did store an ImageKit URL
+	 * endpoint (directly or indirectly). This migration preserves delivery by
+	 * populating the new credentials url endpoint field.
+	 *
+	 * @return bool True if migration wrote a value, false otherwise.
+	 */
+	protected function maybe_migrate_legacy_settings() {
+		// Do nothing if we already have an url endpoint set.
+		$current = $this->settings ? $this->settings->get_value( 'credentials.url_endpoint' ) : '';
+		if ( is_string( $current ) && '' !== trim( $current ) ) {
+			return false;
+		}
+
+		$legacy = get_option( self::LEGACY_OPTION );
+		if ( ! is_array( $legacy ) ) {
+			return false;
+		}
+
+		$candidate = '';
+		if ( ! empty( $legacy['cname'] ) && is_string( $legacy['cname'] ) ) {
+			$candidate = (string) $legacy['cname'];
+		} elseif ( ! empty( $legacy['imagekit_url_endpoint'] ) && is_string( $legacy['imagekit_url_endpoint'] ) ) {
+			$candidate = (string) $legacy['imagekit_url_endpoint'];
+		} elseif ( ! empty( $legacy['imagekit_id'] ) && is_string( $legacy['imagekit_id'] ) ) {
+			$candidate = 'https://ik.imagekit.io/' . trim( (string) $legacy['imagekit_id'], "/ \t\n\r\0\x0B" );
+		}
+
+		$candidate = trim( (string) $candidate );
+		if ( '' === $candidate ) {
+			return false;
+		}
+		// Normalize: ensure scheme and trailing slash.
+		if ( 0 === strpos( $candidate, '//' ) ) {
+			$candidate = 'https:' . $candidate;
+		}
+		if ( ! preg_match( '#^https?://#i', $candidate ) ) {
+			$candidate = 'https://' . ltrim( $candidate, '/' );
+		}
+		$candidate = rtrim( $candidate, '/' ) . '/';
+		if ( ! filter_var( $candidate, FILTER_VALIDATE_URL ) ) {
+			return false;
+		}
+
+		$url_endpoint_setting = $this->settings->get_setting( 'credentials.url_endpoint' );
+		if ( ! $url_endpoint_setting ) {
+			return false;
+		}
+		$url_endpoint_setting->set_pending( $candidate );
+		$this->settings->save();
+
+		return true;
+	}
+
+	/**
 	 * Check whether a connection was established.
 	 *
 	 * @return boolean
 	 */
 	public function is_connected() {
-		$connected = $this->plugin->settings->get_param( 'connected', null );
-		if ( ! is_null( $connected ) ) {
-			return $connected;
-		}
+		return true === $this->get_connection_state();
+	}
+
+	/**
+	 * Get tri-state connection state.
+	 *
+	 * - false: no URL endpoint configured
+	 * - 'partial': URL endpoint configured but API keys missing
+	 * - true: URL endpoint + API keys configured
+	 *
+	 * @return bool|string
+	 */
+	public function get_connection_state() {
 		$url_endpoint = $this->settings->get_value( 'credentials.url_endpoint' );
-		if ( empty( $url_endpoint ) ) {
+		$url_endpoint = is_string( $url_endpoint ) ? trim( $url_endpoint ) : '';
+		if ( '' === $url_endpoint ) {
 			return false;
 		}
 
 		$public_key  = $this->settings->get_value( 'credentials.public_key' );
 		$private_key = $this->settings->get_value( 'credentials.private_key' );
-		if ( empty( $public_key ) || empty( $private_key ) ) {
-			return false;
+		$public_key  = is_string( $public_key ) ? trim( $public_key ) : '';
+		$private_key = is_string( $private_key ) ? trim( $private_key ) : '';
+		if ( '' === $public_key || '' === $private_key ) {
+			return 'partial';
 		}
 
 		return true;
@@ -250,9 +340,19 @@ class Credentials_Manager extends Settings_Component implements Config, Setup {
 			'fieldErrors' => array(),
 		);
 
+		$url_endpoint = is_string( $url_endpoint ) ? trim( $url_endpoint ) : '';
+		$public_key   = is_string( $public_key ) ? trim( $public_key ) : '';
+		$private_key  = is_string( $private_key ) ? trim( $private_key ) : '';
+
 		$test_url_endpoint = $this->test_url_endpoint( $url_endpoint );
-		$test_public_key   = str_starts_with( $public_key, 'public_' );
-		$test_private_key  = str_starts_with( $private_key, 'private_' );
+
+		$has_keys = '' !== $public_key || '' !== $private_key;
+		$test_public_key = true;
+		$test_private_key = true;
+		if ( $has_keys ) {
+			$test_public_key  = '' !== $public_key && str_starts_with( $public_key, 'public_' );
+			$test_private_key = '' !== $private_key && str_starts_with( $private_key, 'private_' );
+		}
 
 		if ( ! $test_url_endpoint ) {
 			$result['ok']      = false;
@@ -264,6 +364,14 @@ class Credentials_Manager extends Settings_Component implements Config, Setup {
 				'https://ik.imagekit.io/imagekit_id'
 			);
 
+			return $result;
+		}
+
+		// Endpoint-only setup (legacy upgrade path): accept without keys.
+		if ( ! $has_keys ) {
+			$result['ok']      = true;
+			$result['code']    = 'endpoint_only';
+			$result['message'] = __( 'URL endpoint saved. Add your API keys to enable uploads and usage stats.', 'imagekit' );
 			return $result;
 		}
 
@@ -355,6 +463,9 @@ class Credentials_Manager extends Settings_Component implements Config, Setup {
 	 * @param string $new_version      The New version number.
 	 */
 	public function upgrade_settings( $previous_version, $new_version ) {
+		$this->maybe_migrate_legacy_settings();
+		// Allow other components to hook into upgrades.
+		do_action( 'imagekit_version_upgrade', $previous_version, $new_version );
 	}
 
 	/**
@@ -397,8 +508,12 @@ class Credentials_Manager extends Settings_Component implements Config, Setup {
 		$imagekit_url_endpoint = $this->settings->get_value( 'credentials.url_endpoint' );
 		$imagekit_public_key   = $this->settings->get_value( 'credentials.public_key' );
 		$imagekit_private_key  = $this->settings->get_value( 'credentials.private_key' );
-		if ( ! empty( $imagekit_url_endpoint ) && ! empty( $imagekit_public_key ) && ! empty( $imagekit_private_key ) ) {
 
+		$imagekit_url_endpoint = is_string( $imagekit_url_endpoint ) ? trim( $imagekit_url_endpoint ) : '';
+		$imagekit_public_key   = is_string( $imagekit_public_key ) ? trim( $imagekit_public_key ) : '';
+		$imagekit_private_key  = is_string( $imagekit_private_key ) ? trim( $imagekit_private_key ) : '';
+
+		if ( '' !== $imagekit_url_endpoint ) {
 			$this->set_credentials(
 				array(
 					'url_endpoint' => $imagekit_url_endpoint,
@@ -406,10 +521,13 @@ class Credentials_Manager extends Settings_Component implements Config, Setup {
 					'private_key'  => $imagekit_private_key,
 				)
 			);
+		}
+
+		$this->plugin->settings->set_param( 'connected', $this->get_connection_state() );
+
+		if ( $this->is_connected() ) {
 			$this->api = new API( $this, $this->plugin->version );
 			$this->usage_stats();
-
-			$this->plugin->settings->set_param( 'connected', $this->is_connected() );
 		}
 	}
 
@@ -417,34 +535,24 @@ class Credentials_Manager extends Settings_Component implements Config, Setup {
 	 * Gets the config of a connection.
 	 */
 	public function get_config() {
-		$old_version = $this->settings->get_value( 'version' );
-		if ( empty( $old_version ) ) {
-			$old_version = '2.0.1';
-		}
-		if ( version_compare( $this->plugin->version, $old_version, '>' ) ) {
-			/**
-			 * Do action to allow upgrading of different areas.
-			 *
-			 * @since 2.3.1
-			 *
-			 * @param string $new_version The version upgrading to.
-			 *
-			 * @param string $old_version The version upgrading from.
-			 */
-			do_action( 'ImageKit_version_upgrade', $old_version, $this->plugin->version );
-		}
+		// No-op: version upgrades are handled centrally by Plugin::init_component_settings.
 	}
 
 
 	/**
 	 * Upgrade connection settings.
 	 *
-	 * @param string $old_version The previous version.
+	 * @param string $previous_version The previous version.
+	 * @param string $new_version      The new version.
 	 */
-	public function upgrade_connection( $old_version ) {
+	public function upgrade_connection( $previous_version, $new_version = null ) {
 	}
 
 	public function usage_stats( $refresh = false ) {
+		if ( ! $this->api || ! method_exists( $this->api, 'usage' ) ) {
+			$this->usage = array();
+			return;
+		}
 		$stats = get_transient( self::META_KEYS['usage'] );
 		if ( empty( $stats ) || true === $refresh ) {
 			$last_usage = $this->settings->get_setting( 'last_usage' );
@@ -547,6 +655,8 @@ class Credentials_Manager extends Settings_Component implements Config, Setup {
 
 			return $data;
 		}
+
+		$this->plugin->settings->set_param( 'connected', $this->get_connection_state() );
 
 		return $data;
 	}

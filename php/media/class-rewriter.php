@@ -44,12 +44,7 @@ class Rewriter {
 		$this->imagekit_folder = is_string( $imagekit_folder ) ? (string) $imagekit_folder : '';
 	}
 
-	public function setup() {
-		add_filter( 'the_content', array( $this, 'rewrite_html' ), 20 );
-		add_filter( 'widget_text', array( $this, 'rewrite_html' ), 20 );
-		add_filter( 'widget_text_content', array( $this, 'rewrite_html' ), 20 );
-		add_filter( 'render_block', array( $this, 'rewrite_block' ), 20, 2 );
-	}
+	public function setup() {}
 
 	public function rewrite_block( $block_content, $block ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 		return $this->rewrite_html( $block_content );
@@ -66,8 +61,9 @@ class Rewriter {
 		if ( false === strpos( $html, '<img' ) && false === strpos( $html, '<source' ) && false === strpos( $html, '<video' ) ) {
 			return $html;
 		}
+		$looks_like_full_document = ( false !== stripos( $html, '<!doctype' ) ) || ( false !== stripos( $html, '<html' ) );
 
-		if ( class_exists( '\\DOMDocument' ) ) {
+		if ( ! $looks_like_full_document && class_exists( '\\DOMDocument' ) ) {
 			$rewritten = $this->rewrite_with_dom( $html );
 			if ( is_string( $rewritten ) && '' !== $rewritten ) {
 				return $rewritten;
@@ -78,11 +74,12 @@ class Rewriter {
 	}
 
 	protected function is_connected() {
-		if ( empty( $this->plugin->settings ) || ! $this->plugin->settings->get_param( 'connected' ) ) {
+		if ( empty( $this->plugin->settings ) ) {
 			return false;
 		}
-
-		return true;
+		$url_endpoint = $this->plugin->settings->get_value( 'credentials.url_endpoint' );
+		$url_endpoint = is_string( $url_endpoint ) ? trim( $url_endpoint ) : '';
+		return '' !== $url_endpoint;
 	}
 
 	protected function get_direction() {

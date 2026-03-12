@@ -140,6 +140,10 @@ class Input extends Component {
 		$struct['attributes']['class'][] = 'regular-' . $this->type;
 		$struct['render']                = true;
 
+		if ( true === $this->setting->get_param( 'disabled', false ) ) {
+			$struct['attributes']['disabled'] = 'disabled';
+		}
+
 		if ( $this->setting->has_param( 'required' ) ) {
 			$struct['attributes']['required'] = 'required';
 		}
@@ -197,6 +201,9 @@ class Input extends Component {
 
 		$struct['element']               = 'label';
 		$struct['attributes']['class'][] = 'description';
+		if ( true === $this->setting->get_param( 'disabled', false ) ) {
+			$struct['attributes']['class'][] = 'ik-disabled-message';
+		}
 		$struct['attributes']['for']     = $this->setting->get_slug();
 		$struct['content']               = $this->setting->get_param( 'description' );
 

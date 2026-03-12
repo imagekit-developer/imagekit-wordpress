@@ -96,7 +96,14 @@ class System_Report {
 		);
 
 		if ( isset( $plugin->settings ) && method_exists( $plugin->settings, 'get_param' ) ) {
-			$info['Connected'] = $plugin->settings->get_param( 'connected' ) ? 'Yes' : 'No';
+			$connected = $plugin->settings->get_param( 'connected' );
+			if ( true === $connected ) {
+				$info['Connected'] = 'Yes';
+			} elseif ( 'partial' === $connected ) {
+				$info['Connected'] = 'Partial';
+			} else {
+				$info['Connected'] = 'No';
+			}
 		}
 
 		$manager = $plugin->get_component( 'credentials_manager' );

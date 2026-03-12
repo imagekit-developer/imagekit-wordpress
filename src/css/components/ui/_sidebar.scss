@@ -11,6 +11,15 @@
 		padding: $size-padding-sidebar;
 	}
 
+	> .notice.notice-warning {
+		margin-left: 0;
+		margin-right: 0;
+		margin-top: 13px;
+		margin-bottom: 12px;
+		width: 100%;
+		box-sizing: border-box;
+	}
+
 	.ik-usage-stats {
 		&:first-child {
 			margin-top: 0;

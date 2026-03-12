@@ -144,9 +144,8 @@ class API {
 		if ( '' !== $folder ) {
 			$payload['folder'] = '/' . $folder;
 		}
-		if ( isset( $options['useUniqueFileName'] ) ) {
-			$payload['useUniqueFileName'] = $options['useUniqueFileName'] ? 'true' : 'false';
-		}
+		
+		$payload['useUniqueFileName'] = 'false';
 		if ( isset( $options['overwriteFile'] ) ) {
 			$payload['overwriteFile'] = $options['overwriteFile'] ? 'true' : 'false';
 		}

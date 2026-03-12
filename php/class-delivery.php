@@ -33,6 +33,17 @@ class Delivery extends Settings_Component implements Setup {
 		return true;
 	}
 
+	public function is_video_delivery_enabled() {
+		$config = $this->settings ? $this->settings->get_value( 'media_display' ) : null;
+		if ( ! is_array( $config ) ) {
+			return true;
+		}
+		if ( ! empty( $config['video_delivery'] ) && 'off' === $config['video_delivery'] ) {
+			return false;
+		}
+		return true;
+	}
+
 	/**
 	 * Get the asset delivery configuration array.
 	 *
