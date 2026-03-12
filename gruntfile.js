@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 module.exports = function ( grunt ) {
 	// Load all Grunt plugins.
 	require( 'load-grunt-tasks' )( grunt );
@@ -24,8 +25,11 @@ module.exports = function ( grunt ) {
 		copy: {
 			dist: {
 				src: [
+					'.wordpress-org/**',
 					'css/**',
+					'images/**',
 					'js/**',
+					'languages/**',
 					'php/**',
 					'ui-definitions/**',
 					'*.php',
