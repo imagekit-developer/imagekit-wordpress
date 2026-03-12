@@ -3,7 +3,7 @@ Contributors: imagekit
 Donate link: 
 Tags: images,image management, image manipulation, image optimization, image optimisation,imagekit, wepb,photo, photos, picture, pictures, thumbnail, thumbnails, upload, batch, cdn, content delivery network
 Requires at least: 4.7
-Tested up to: 6.8.3
+Tested up to: 6.9.4
 Requires PHP: 5.6
 Stable tag: STABLETAG
 License: GPLv2 or later
@@ -92,6 +92,25 @@ This is because image dimensions are not as per the layout. We could have done i
 1
 
 == Changelog ==
+
+= 5.0.0 =
+* Complete plugin rewrite with modern architecture using PHP namespaces and OOP design.
+* New setup wizard with guided onboarding and credential prefill support.
+* Added tri-state connection model for improved account connection management.
+* New asset delivery system with category-based URL rewriting for images, videos, and other assets.
+* Added video delivery settings with global video transformations support.
+* Added responsive images settings with customizable breakpoint validation.
+* New system report page with copy and download functionality for easier debugging.
+* Redesigned admin settings UI with panel-based layout, sidebar with usage stats, and improved navigation.
+* Added block editor integration for Gutenberg.
+* Added Enhanced Media Library (EML) integration.
+* Added REST API endpoints for settings management and wizard flow.
+* Added credentials manager for secure handling of ImageKit API keys.
+* Added custom icon font for plugin UI elements.
+* Added i18n support with translator comments and POT file generation.
+* Requires PHP 5.6 or higher.
+* Requires WordPress 4.7 or higher.
+* Tested up to WordPress 6.9.4.
 
 4.1.3
 Tested on Wordpress 6.4.2
