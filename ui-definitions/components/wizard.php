@@ -159,7 +159,7 @@ $imagekit->add_script_data( 'wizard', $data );
 								echo wp_kses_post(
 									sprintf(
 										/* translators: %s: URL to advanced options documentation */
-										__( 'Need to configure advanced options like authentication? <a href="%s" target="_blank" rel="noopener noreferrer">See the documentation</a>.', 'imagekit' ),
+										__( 'Need to configure advanced options? <a href="%s" target="_blank" rel="noopener noreferrer">See the documentation</a>.', 'imagekit' ),
 										esc_url( 'https://imagekit.io/docs/integration/web-server#advanced-options-for-web-server-origin' )
 									)
 								);
@@ -284,10 +284,10 @@ $imagekit->add_script_data( 'wizard', $data );
 				<section class="ik-wizard-panel" id="ik-wizard-panel-4" data-step="4" role="tabpanel" tabindex="0" aria-label="<?php esc_attr_e( 'Success', 'imagekit' ); ?>" hidden="hidden">
 					<div class="ik-wizard-field">
 						<h3 class="ik-wizard-intro">
-							<?php esc_html_e( 'All set! We\'re starting to sync your files to ImageKit', 'imagekit' ); ?>
+							<?php esc_html_e( 'All set! Your site is now optimized with ImageKit', 'imagekit' ); ?>
 						</h3>
 						<p class="ik-wizard-copy-text">
-							<?php esc_html_e( 'You have successfully set up the ImageKit plugin for your site, your media assets will now be optimized and delivered via fast CDN. To further configure the plugin, take a look at the various settings available.', 'imagekit' ); ?>
+							<?php esc_html_e( 'You have successfully set up the ImageKit plugin for your site. Your images and videos will now be automatically optimized and delivered via ImageKit\'s fast global CDN. To further configure the plugin, explore the various settings available in the plugin dashboard.', 'imagekit' ); ?>
 						</p>
 					</div>
 				</section>
