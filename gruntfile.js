@@ -5,17 +5,9 @@ module.exports = function ( grunt ) {
 
 	const pluginVersion = grunt.file.read( '.version' );
 
-	const options = {
-		plugin_slug: 'imagekit',
-		plugin_main_file: 'imagekit.php',
-		build_dir: '<%= dist_dir %>',
-		assets_dir: 'assets',
-		svn_user: 'imagekit',
-	};
-
 	grunt.initConfig( {
 		pluginVersion,
-		plugin_slug: options.plugin_slug,
+		plugin_slug: 'imagekit',
 		dist_dir: 'build',
 		package_dir: 'package/dist',
 		tester_dir: '<%= package_dir %>/imagekit-update-tester',
@@ -84,21 +76,6 @@ module.exports = function ( grunt ) {
 			},
 		},
 
-		wp_deploy: {
-			default: {
-				// Default deploy to trunk and a tag release.
-				options,
-			},
-			assets: {
-				// Deploy only screenshots and icons.
-				options: {
-					...options,
-					deploy_trunk: false,
-					deploy_tag: false,
-				},
-			},
-		},
-
 		addtextdomain: {
 			options: {
 				textdomain: 'imagekit',
@@ -163,8 +140,4 @@ module.exports = function ( grunt ) {
 		'copy:package',
 		'compress:package',
 	] );
-
-	grunt.registerTask( 'deploy', [ 'prepare', 'wp_deploy:default' ] );
-
-	grunt.registerTask( 'deploy-assets', [ 'wp_deploy:assets' ] );
 };

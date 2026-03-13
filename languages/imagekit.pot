@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: ImageKit STABLETAG\n"
 "Report-Msgid-Bugs-To: "
 "https://github.com/imagekit-developer/imagekit-wordpress\n"
-"POT-Creation-Date: 2026-03-13 09:35:39+00:00\n"
+"POT-Creation-Date: 2026-03-13 19:55:58+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -832,8 +832,8 @@ msgid ""
 msgstr ""
 
 #: ui-definitions/settings-responsive.php:38
-#: ui-definitions/settings-responsive.php:73
-#: ui-definitions/settings-responsive.php:84
+#: ui-definitions/settings-responsive.php:74
+#: ui-definitions/settings-responsive.php:85
 msgid "px"
 msgstr ""
 
@@ -854,22 +854,22 @@ msgstr ""
 msgid "Recommended value: 3-40"
 msgstr ""
 
-#: ui-definitions/settings-responsive.php:67
+#: ui-definitions/settings-responsive.php:68
 msgid "Image width limit"
 msgstr ""
 
-#: ui-definitions/settings-responsive.php:68
+#: ui-definitions/settings-responsive.php:69
 msgid ""
 "The minimum and maximum width of an image created as a breakpoint. Leave "
 "\"max\" as empty to automatically detect based on the largest registered "
 "size in WordPress."
 msgstr ""
 
-#: ui-definitions/settings-responsive.php:72
+#: ui-definitions/settings-responsive.php:73
 msgid "Max"
 msgstr ""
 
-#: ui-definitions/settings-responsive.php:83
+#: ui-definitions/settings-responsive.php:84
 msgid "Min"
 msgstr ""
 
