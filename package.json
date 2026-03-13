@@ -17,8 +17,6 @@
   },
   "scripts": {
     "build": "wp-scripts build",
-    "deploy": "npm run build && grunt deploy && npm run release",
-    "deploy-assets": "grunt deploy-assets",
     "dev": "wp-scripts start",
     "i18n": "grunt i18n",
     "lint": "npm-run-all lint:php lint:js lint:style",
@@ -30,10 +28,7 @@
     "package": "./package/package.sh",
     "package:build": "npm run build && grunt package",
     "postinstall": "composer install",
-    "readme": "composer readme",
-    "release": "release-it --no-increment",
-    "release:ci": "release-it --ci",
-    "release:dry": "release-it --dry-run"
+    "readme": "composer readme"
   },
   "husky": {
     "hooks": {
@@ -52,7 +47,6 @@
     ]
   },
   "devDependencies": {
-    "@release-it/bumper": "^4.0.0",
     "@testing-library/react": "^11.1.0",
     "@tippyjs/react": "^4.2.5",
     "@wordpress/api-fetch": "^3.23.1",
@@ -103,9 +97,7 @@
     "grunt-contrib-clean": "^2.0.0",
     "grunt-contrib-compress": "^1.6.0",
     "grunt-contrib-copy": "^1.0.0",
-    "grunt-shell": "^3.0.1",
     "grunt-text-replace": "^0.4.0",
-    "grunt-wp-deploy": "^2.1.2",
     "grunt-wp-i18n": "^1.0.3",
     "human-format": "^0.11.0",
     "husky": "^4.3.8",
@@ -132,7 +124,6 @@
     "puppeteer": "npm:puppeteer-core@^3.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "release-it": "15.6.0",
     "rtlcss": "^2.6.1",
     "rtlcss-webpack-plugin": "^4.0.4",
     "semver": "^7.3.2",
