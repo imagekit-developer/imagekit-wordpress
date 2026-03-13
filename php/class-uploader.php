@@ -451,7 +451,7 @@ class Uploader extends Settings_Component implements Setup, Assets {
 							'</li><li class="ik">',
 							'</li><li class="wp_only">',
 							'</li></ul>',
-							'<a href="https://ImageKit.com/documentation/wordpress_integration#storage" target="_blank" rel="noopener noreferrer">',
+							'<a href="https://imagekit.io/docs/integration/wordpress" target="_blank" rel="noopener noreferrer">',
 							'</a>'
 						),
 						'default'      => 'wp_high_ik_high',
