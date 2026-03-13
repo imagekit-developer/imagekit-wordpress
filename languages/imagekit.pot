@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: ImageKit STABLETAG\n"
 "Report-Msgid-Bugs-To: "
 "https://github.com/imagekit-developer/imagekit-wordpress\n"
-"POT-Creation-Date: 2026-03-12 20:53:24+00:00\n"
+"POT-Creation-Date: 2026-03-13 09:35:39+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -255,176 +255,166 @@ msgid "Finish"
 msgstr ""
 
 #: ui-definitions/components/wizard.php:91
-msgid "Welcome and thank you for installing the ImageKit plugin"
+msgid "Make your WordPress site faster!"
+msgstr ""
+
+#: ui-definitions/components/wizard.php:94
+msgid ""
+"Images and videos are slowing down your site. ImageKit fixes this "
+"automatically with no code changes or migration. Just connect and go."
+msgstr ""
+
+#: ui-definitions/components/wizard.php:97
+msgid "Works instantly with all your existing images and videos."
+msgstr ""
+
+#: ui-definitions/components/wizard.php:98
+msgid "Automatically delivers modern formats like WebP, AVIF, WebM etc."
 msgstr ""
 
 #: ui-definitions/components/wizard.php:99
-msgid "Deliver fast, optimized media on every page"
+msgid "Optimizes every image and video during delivery via fast global CDN."
 msgstr ""
 
-#: ui-definitions/components/wizard.php:102
-msgid ""
-"ImageKit helps you automatically optimize and deliver images and videos "
-"with built-in transformations, CDN delivery, and modern formats - so your "
-"site stays fast without extra effort."
+#: ui-definitions/components/wizard.php:100
+msgid "Your original WordPress files stay safe and untouched."
 msgstr ""
 
-#: ui-definitions/components/wizard.php:105
-msgid "Serve images in next-gen formats like WebP and AVIF"
+#: ui-definitions/components/wizard.php:103
+msgid "Connect your ImageKit account to get started."
 msgstr ""
 
-#: ui-definitions/components/wizard.php:106
-msgid "Optimize images automatically on delivery"
+#: ui-definitions/components/wizard.php:111
+msgid "Connect your WordPress site to ImageKit"
 msgstr ""
 
-#: ui-definitions/components/wizard.php:107
-msgid "Keep your original WordPress media untouched"
-msgstr ""
-
-#: ui-definitions/components/wizard.php:110
-msgid "Next, connect your ImageKit account to start optimizing your media."
-msgstr ""
-
-#: ui-definitions/components/wizard.php:114
-msgid "Placeholder graphic"
-msgstr ""
-
-#: ui-definitions/components/wizard.php:116
-msgid "Graphic / image placeholder"
+#: ui-definitions/components/wizard.php:118
+msgid "First, add your WordPress site as an origin in your ImageKit dashboard:"
 msgstr ""
 
 #: ui-definitions/components/wizard.php:126
-msgid "Configure your ImageKit integration"
-msgstr ""
-
-#: ui-definitions/components/wizard.php:133
-msgid ""
-"Configure the URL endpoint to point to your WordPress website using the "
-"following steps in your ImageKit dashboard:"
-msgstr ""
-
-#: ui-definitions/components/wizard.php:141
 #. translators: %s: URL to ImageKit external storage dashboard
 msgid ""
-"Go to the <a href=\"%s\" target=\"_blank\" rel=\"noopener "
-"noreferrer\">external storage section</a> in your ImageKit dashboard. Under "
-"the Origins section, click on the Add origin button."
+"Open the <a href=\"%s\" target=\"_blank\" rel=\"noopener "
+"noreferrer\">External storage section</a> in your ImageKit dashboard and "
+"click <strong>Add new</strong>."
 msgstr ""
 
-#: ui-definitions/components/wizard.php:152
+#: ui-definitions/components/wizard.php:137
 #. translators: %s: URL to web server origin documentation
 msgid ""
-"Choose <a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">Web "
-"server</a> from the origin type dropdown."
+"Select <a href=\"%s\" target=\"_blank\" rel=\"noopener "
+"noreferrer\"><strong>Web Folder</strong></a> as the origin type."
 msgstr ""
 
-#: ui-definitions/components/wizard.php:158
-msgid ""
-"Give your origin a name (it will appear in the list of origins you have "
-"added)."
+#: ui-definitions/components/wizard.php:143
+msgid "Enter a name for this origin (e.g., \"My WordPress Site\")."
 msgstr ""
 
-#: ui-definitions/components/wizard.php:164
+#: ui-definitions/components/wizard.php:149
 #. translators: %s: WordPress site URL
-msgid "Fill out the base URL as your WordPress site URL: <code>%s</code>"
+msgid ""
+"Set the <strong>Base URL</strong> to your WordPress site URL: "
+"<code>%s</code>"
 msgstr ""
 
-#: ui-definitions/components/wizard.php:175
+#: ui-definitions/components/wizard.php:155
+msgid "Leave other settings at default and click Submit."
+msgstr ""
+
+#: ui-definitions/components/wizard.php:162
 #. translators: %s: URL to advanced options documentation
 msgid ""
-"To configure advanced options, refer <a href=\"%s\" target=\"_blank\" "
-"rel=\"noopener noreferrer\">here</a>."
+"Need to configure advanced options? <a href=\"%s\" target=\"_blank\" "
+"rel=\"noopener noreferrer\">See the documentation</a>."
 msgstr ""
 
-#: ui-definitions/components/wizard.php:181
-msgid "Click on Submit."
-msgstr ""
-
-#: ui-definitions/components/wizard.php:191
+#: ui-definitions/components/wizard.php:176
 msgid "Please fill out the URL endpoint to continue."
 msgstr ""
 
-#: ui-definitions/components/wizard.php:195
+#: ui-definitions/components/wizard.php:180
 msgid "URL endpoint"
 msgstr ""
 
-#: ui-definitions/components/wizard.php:210
+#: ui-definitions/components/wizard.php:195
 msgid "Public key"
 msgstr ""
 
-#: ui-definitions/components/wizard.php:225
+#: ui-definitions/components/wizard.php:210
 msgid "Private key"
 msgstr ""
 
-#: ui-definitions/components/wizard.php:243
+#: ui-definitions/components/wizard.php:228
 #. translators: %s: URL to ImageKit developer dashboard
 msgid ""
-"Enter the URL endpoint, public key, and private key from your ImageKit "
-"dashboard. You can find these in your ImageKit dashboard under the <a "
-"href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">Developer "
-"section</a>."
+"Find your credentials in the <a href=\"%s\" target=\"_blank\" "
+"rel=\"noopener noreferrer\">Developer section</a> of your ImageKit "
+"dashboard. Copy the <strong>URL endpoint</strong>, <strong>Public "
+"key</strong>, and <strong>Private key</strong> and paste them above."
 msgstr ""
 
-#: ui-definitions/components/wizard.php:256
+#: ui-definitions/components/wizard.php:241
 msgid "Recommended settings"
 msgstr ""
 
-#: ui-definitions/components/wizard.php:259
+#: ui-definitions/components/wizard.php:244
 msgid ""
 "Choose what you'd like to deliver through ImageKit. You can always change "
 "these later in the plugin settings."
 msgstr ""
 
-#: ui-definitions/components/wizard.php:266
+#: ui-definitions/components/wizard.php:251
 msgid "Images"
 msgstr ""
 
-#: ui-definitions/components/wizard.php:267
+#: ui-definitions/components/wizard.php:252
 msgid ""
 "Optimize and deliver images via ImageKit CDN with automatic format "
 "conversion."
 msgstr ""
 
-#: ui-definitions/components/wizard.php:277
+#: ui-definitions/components/wizard.php:262
 msgid "Videos"
 msgstr ""
 
-#: ui-definitions/components/wizard.php:278
+#: ui-definitions/components/wizard.php:263
 msgid "Deliver videos through ImageKit for faster playback and adaptive streaming."
 msgstr ""
 
-#: ui-definitions/components/wizard.php:288
+#: ui-definitions/components/wizard.php:273
 msgid "Assets"
 msgstr ""
 
-#: ui-definitions/components/wizard.php:289
+#: ui-definitions/components/wizard.php:274
 msgid "Deliver theme, plugin, and WordPress core CSS & JS files via ImageKit."
 msgstr ""
 
-#: ui-definitions/components/wizard.php:299
+#: ui-definitions/components/wizard.php:284
 msgid "Success"
 msgstr ""
 
-#: ui-definitions/components/wizard.php:302
-msgid "All set! We're starting to sync your files to ImageKit"
+#: ui-definitions/components/wizard.php:287
+msgid "All set! Your site is now optimized with ImageKit"
 msgstr ""
 
-#: ui-definitions/components/wizard.php:305
+#: ui-definitions/components/wizard.php:290
 msgid ""
-"You have successfully set up the ImageKit plugin for your site, your media "
-"assets will now be optimized and delivered via fast CDN. To further "
-"configure the plugin, take a look at the various settings available."
+"You have successfully set up the ImageKit plugin for your site. Your images "
+"and videos will now be automatically optimized and delivered via ImageKit's "
+"fast global CDN. To further configure the plugin, explore the various "
+"settings available in the plugin dashboard."
 msgstr ""
 
-#: ui-definitions/components/wizard.php:313
+#: ui-definitions/components/wizard.php:298
 msgid "Back"
 msgstr ""
 
-#: ui-definitions/components/wizard.php:316
+#: ui-definitions/components/wizard.php:301
 msgid "Next"
 msgstr ""
 
-#: ui-definitions/components/wizard.php:319
+#: ui-definitions/components/wizard.php:304
 msgid "Goto plugin dashboard"
 msgstr ""
 
@@ -673,10 +663,51 @@ msgid ""
 msgstr ""
 
 #: ui-definitions/settings-pages.php:359
-msgid "I've installed and set up the ImageKit plugin, what happens now?"
+msgid "How does this plugin work?"
 msgstr ""
 
 #: ui-definitions/settings-pages.php:361
+msgid ""
+"The plugin makes your site faster by automatically delivering optimized "
+"images and videos to your visitors. Every image gets converted to modern "
+"formats like WebP and AVIF, compressed for faster loading, and served "
+"through ImageKit's global CDN - all without you doing anything. Processing "
+"happens entirely on ImageKit's servers, not yours, so your WordPress server "
+"stays fast and responsive. Technically, the plugin rewrites your media URLs "
+"on the fly to point to ImageKit instead of your WordPress server, so "
+"images, videos, and optionally CSS/JS files are optimized and cached "
+"globally for lightning-fast delivery."
+msgstr ""
+
+#: ui-definitions/settings-pages.php:365
+msgid "What happens to my original WordPress files?"
+msgstr ""
+
+#: ui-definitions/settings-pages.php:367
+msgid ""
+"Your original files remain safe and untouched in WordPress. The plugin "
+"delivers optimized versions through ImageKit without modifying your source "
+"files. If you ever disable the plugin, your site will continue to work "
+"normally using the original files."
+msgstr ""
+
+#: ui-definitions/settings-pages.php:371
+msgid "Can I disable the plugin? Will my site break?"
+msgstr ""
+
+#: ui-definitions/settings-pages.php:373
+msgid ""
+"Yes, you can safely disable or uninstall the plugin at any time. Your site "
+"will automatically fall back to serving files from WordPress, since the "
+"plugin does not modify your original content. There is no lock-in or risk "
+"to your website."
+msgstr ""
+
+#: ui-definitions/settings-pages.php:377
+msgid "I've installed and set up the ImageKit plugin, what happens now?"
+msgstr ""
+
+#: ui-definitions/settings-pages.php:379
 msgid ""
 "If you left all the settings as default, the plugin will automatically "
 "rewrite your media URLs to deliver them through ImageKit. Your images and "
@@ -684,91 +715,24 @@ msgid ""
 "seeing improvements in performance across your site."
 msgstr ""
 
-#: ui-definitions/settings-pages.php:365
-msgid "How does this plugin work?"
-msgstr ""
-
-#: ui-definitions/settings-pages.php:367
-msgid ""
-"This plugin rewrites your site's media and asset URLs to deliver them "
-"through your ImageKit endpoint. This includes images, videos, and "
-"optionally static assets like CSS and JavaScript files, so they are "
-"automatically optimized and served via ImageKit."
-msgstr ""
-
-#: ui-definitions/settings-pages.php:371
-msgid ""
-"I installed the plugin but Google PageSpeed Insights is still showing image "
-"related warnings"
-msgstr ""
-
-#: ui-definitions/settings-pages.php:374
-msgid ""
-"This plugin automatically optimizes images and serves them in next-gen "
-"formats including WebP. However, it does not automatically resize images to "
-"match your layout."
-msgstr ""
-
-#: ui-definitions/settings-pages.php:381
-msgid "Do I have to manually change the old posts to optimize their images?"
-msgstr ""
-
 #: ui-definitions/settings-pages.php:383
-msgid "No, this plugin automatically takes care of that."
+msgid "Do I need to migrate my existing media to ImageKit?"
 msgstr ""
 
-#: ui-definitions/settings-pages.php:387
-msgid "Does this plugin support custom CNAME?"
+#: ui-definitions/settings-pages.php:385
+msgid ""
+"No migration is needed. The plugin automatically delivers your existing "
+"WordPress media through ImageKit without any manual changes to old posts. "
+"New uploads can be automatically sent to ImageKit based on your storage "
+"settings, while existing files stay where they are and are served through "
+"ImageKit for optimization."
 msgstr ""
 
 #: ui-definitions/settings-pages.php:389
-msgid ""
-"Yes, you can email developer@imagekit.io to configure a custom CNAME for "
-"your account and then specify that in the plugin settings page."
-msgstr ""
-
-#: ui-definitions/settings-pages.php:393
-msgid "Can I configure this plugin to use ImageKit for custom upload directories?"
-msgstr ""
-
-#: ui-definitions/settings-pages.php:395
-msgid ""
-"Yes, you can specify any number of custom directory locations on the plugin "
-"settings page."
-msgstr ""
-
-#: ui-definitions/settings-pages.php:399
-msgid "Does ImageKit support all image formats?"
-msgstr ""
-
-#: ui-definitions/settings-pages.php:401
-msgid ""
-"ImageKit supports all popular image formats that cover 99.99% of use cases. "
-"On the settings page, you can further configure whether to allow or "
-"disallow a particular file type to be loaded via ImageKit."
-msgstr ""
-
-#: ui-definitions/settings-pages.php:405
-msgid ""
-"I installed the plugin, but the ImageKit website analyzer is suggesting "
-"more optimization."
-msgstr ""
-
-#: ui-definitions/settings-pages.php:408
-msgid ""
-"This is because image dimensions are not matching the layout. We could "
-"resize using JavaScript in the frontend like other plugins, but we do not "
-"recommend it. The browser triggers the image load as soon as it sees an "
-"image URL in HTML, and intentionally delaying this while JavaScript "
-"calculates the ideal width will ultimately slow down the image load for "
-"your users."
-msgstr ""
-
-#: ui-definitions/settings-pages.php:415
 msgid "Are my media uploads automatically sent to ImageKit?"
 msgstr ""
 
-#: ui-definitions/settings-pages.php:417
+#: ui-definitions/settings-pages.php:391
 msgid ""
 "Yes. When you upload media through the WordPress Media Library, the plugin "
 "automatically offloads it to your ImageKit account. You can configure the "
@@ -777,13 +741,13 @@ msgid ""
 "ImageKit, or only in WordPress."
 msgstr ""
 
-#: ui-definitions/settings-pages.php:421
+#: ui-definitions/settings-pages.php:395
 msgid ""
 "Can I browse and insert assets from my ImageKit account directly in "
 "WordPress?"
 msgstr ""
 
-#: ui-definitions/settings-pages.php:423
+#: ui-definitions/settings-pages.php:397
 msgid ""
 "Yes. The plugin adds an ImageKit tab to the WordPress media modal, allowing "
 "you to browse, search, and select assets from your ImageKit media library. "
@@ -791,7 +755,55 @@ msgid ""
 "your posts and pages without re-uploading."
 msgstr ""
 
-#: ui-definitions/settings-pages.php:441
+#: ui-definitions/settings-pages.php:401
+msgid "Does ImageKit support all image formats?"
+msgstr ""
+
+#: ui-definitions/settings-pages.php:403
+msgid ""
+"ImageKit supports all popular image formats that cover 99.99% of use cases. "
+"On the settings page, you can further configure whether to allow or "
+"disallow a particular file type to be loaded via ImageKit."
+msgstr ""
+
+#: ui-definitions/settings-pages.php:407
+msgid ""
+"I installed the plugin but Google PageSpeed Insights is still showing image "
+"warnings"
+msgstr ""
+
+#: ui-definitions/settings-pages.php:411
+#. translators: %1$s: opening link tag, %2$s: closing link tag
+msgid ""
+"This plugin automatically optimizes images and serves them in next-gen "
+"formats including WebP and AVIF. However, it does not automatically resize "
+"images to match your layout dimensions. This is usually because image "
+"dimensions don't match your layout - use WordPress' %1$snative responsive "
+"images feature%2$s or the plugin's Responsive Images settings to generate "
+"properly sized breakpoints for different screen sizes."
+msgstr ""
+
+#: ui-definitions/settings-pages.php:418
+msgid "Does this plugin support custom CNAME?"
+msgstr ""
+
+#: ui-definitions/settings-pages.php:420
+msgid ""
+"Yes, you can email developer@imagekit.io to configure a custom CNAME for "
+"your account and then specify that in the plugin settings page."
+msgstr ""
+
+#: ui-definitions/settings-pages.php:424
+msgid "Can I configure this plugin to use ImageKit for custom upload directories?"
+msgstr ""
+
+#: ui-definitions/settings-pages.php:426
+msgid ""
+"Yes, you can specify any number of custom directory locations on the plugin "
+"settings page."
+msgstr ""
+
+#: ui-definitions/settings-pages.php:444
 msgid "Debug log"
 msgstr ""
 
