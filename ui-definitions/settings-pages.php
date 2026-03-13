@@ -356,59 +356,33 @@ $settings = array(
 				),
 				array(
 					'type'        => 'panel',
+					'title'       => __( 'How does this plugin work?', 'imagekit' ),
+					'collapsible' => 'closed',
+					'content'     => __( 'The plugin makes your site faster by automatically delivering optimized images and videos to your visitors. Every image gets converted to modern formats like WebP and AVIF, compressed for faster loading, and served through ImageKit\'s global CDN - all without you doing anything. Processing happens entirely on ImageKit\'s servers, not yours, so your WordPress server stays fast and responsive. Technically, the plugin rewrites your media URLs on the fly to point to ImageKit instead of your WordPress server, so images, videos, and optionally CSS/JS files are optimized and cached globally for lightning-fast delivery.', 'imagekit' ),
+				),
+				array(
+					'type'        => 'panel',
+					'title'       => __( 'What happens to my original WordPress files?', 'imagekit' ),
+					'collapsible' => 'closed',
+					'content'     => __( 'Your original files remain safe and untouched in WordPress. The plugin delivers optimized versions through ImageKit without modifying your source files. If you ever disable the plugin, your site will continue to work normally using the original files.', 'imagekit' ),
+				),
+				array(
+					'type'        => 'panel',
+					'title'       => __( 'Can I disable the plugin? Will my site break?', 'imagekit' ),
+					'collapsible' => 'closed',
+					'content'     => __( 'Yes, you can safely disable or uninstall the plugin at any time. Your site will automatically fall back to serving files from WordPress, since the plugin does not modify your original content. There is no lock-in or risk to your website.', 'imagekit' ),
+				),
+				array(
+					'type'        => 'panel',
 					'title'       => __( 'I\'ve installed and set up the ImageKit plugin, what happens now?', 'imagekit' ),
 					'collapsible' => 'closed',
 					'content'     => __( 'If you left all the settings as default, the plugin will automatically rewrite your media URLs to deliver them through ImageKit. Your images and assets will be optimized and served via ImageKit, and you should begin seeing improvements in performance across your site.', 'imagekit' ),
 				),
 				array(
 					'type'        => 'panel',
-					'title'       => __( 'How does this plugin work?', 'imagekit' ),
+					'title'       => __( 'Do I need to migrate my existing media to ImageKit?', 'imagekit' ),
 					'collapsible' => 'closed',
-					'content'     => __( 'This plugin rewrites your site\'s media and asset URLs to deliver them through your ImageKit endpoint. This includes images, videos, and optionally static assets like CSS and JavaScript files, so they are automatically optimized and served via ImageKit.', 'imagekit' ),
-				),
-				array(
-					'type'        => 'panel',
-					'title'       => __( 'I installed the plugin but Google PageSpeed Insights is still showing image related warnings', 'imagekit' ),
-					'collapsible' => 'closed',
-					'content'     => sprintf(
-						__( 'This plugin automatically optimizes images and serves them in next-gen formats including WebP. However, it does not automatically resize images to match your layout.', 'imagekit' ),
-						'<a href="https://make.wordpress.org/core/2015/11/10/responsive-images-in-wordpress-4-4/" target="_blank" rel="noopener noreferrer">',
-						'</a>',
-					),
-				),
-				array(
-					'type'        => 'panel',
-					'title'       => __( 'Do I have to manually change the old posts to optimize their images?', 'imagekit' ),
-					'collapsible' => 'closed',
-					'content'     => __( 'No, this plugin automatically takes care of that.', 'imagekit' ),
-				),
-				array(
-					'type'        => 'panel',
-					'title'       => __( 'Does this plugin support custom CNAME?', 'imagekit' ),
-					'collapsible' => 'closed',
-					'content'     => __( 'Yes, you can email developer@imagekit.io to configure a custom CNAME for your account and then specify that in the plugin settings page.', 'imagekit' ),
-				),
-				array(
-					'type'        => 'panel',
-					'title'       => __( 'Can I configure this plugin to use ImageKit for custom upload directories?', 'imagekit' ),
-					'collapsible' => 'closed',
-					'content'     => __( 'Yes, you can specify any number of custom directory locations on the plugin settings page.', 'imagekit' ),
-				),
-				array(
-					'type'        => 'panel',
-					'title'       => __( 'Does ImageKit support all image formats?', 'imagekit' ),
-					'collapsible' => 'closed',
-					'content'     => __( 'ImageKit supports all popular image formats that cover 99.99% of use cases. On the settings page, you can further configure whether to allow or disallow a particular file type to be loaded via ImageKit.', 'imagekit' ),
-				),
-				array(
-					'type'        => 'panel',
-					'title'       => __( 'I installed the plugin, but the ImageKit website analyzer is suggesting more optimization.', 'imagekit' ),
-					'collapsible' => 'closed',
-					'content'     => sprintf(
-						__( 'This is because image dimensions are not matching the layout. We could resize using JavaScript in the frontend like other plugins, but we do not recommend it. The browser triggers the image load as soon as it sees an image URL in HTML, and intentionally delaying this while JavaScript calculates the ideal width will ultimately slow down the image load for your users.', 'imagekit' ),
-						'<a href="https://make.wordpress.org/core/2015/11/10/responsive-images-in-wordpress-4-4/" target="_blank" rel="noopener noreferrer">',
-						'</a>'
-					),
+					'content'     => __( 'No migration is needed. The plugin automatically delivers your existing WordPress media through ImageKit without any manual changes to old posts. New uploads can be automatically sent to ImageKit based on your storage settings, while existing files stay where they are and are served through ImageKit for optimization.', 'imagekit' ),
 				),
 				array(
 					'type'        => 'panel',
@@ -421,6 +395,35 @@ $settings = array(
 					'title'       => __( 'Can I browse and insert assets from my ImageKit account directly in WordPress?', 'imagekit' ),
 					'collapsible' => 'closed',
 					'content'     => __( 'Yes. The plugin adds an ImageKit tab to the WordPress media modal, allowing you to browse, search, and select assets from your ImageKit media library. Selected assets are imported into WordPress so you can insert them into your posts and pages without re-uploading.', 'imagekit' ),
+				),
+				array(
+					'type'        => 'panel',
+					'title'       => __( 'Does ImageKit support all image formats?', 'imagekit' ),
+					'collapsible' => 'closed',
+					'content'     => __( 'ImageKit supports all popular image formats that cover 99.99% of use cases. On the settings page, you can further configure whether to allow or disallow a particular file type to be loaded via ImageKit.', 'imagekit' ),
+				),
+				array(
+					'type'        => 'panel',
+					'title'       => __( 'I installed the plugin but Google PageSpeed Insights is still showing image warnings', 'imagekit' ),
+					'collapsible' => 'closed',
+					'content'     => sprintf(
+						/* translators: %1$s: opening link tag, %2$s: closing link tag */
+						__( 'This plugin automatically optimizes images and serves them in next-gen formats including WebP and AVIF. However, it does not automatically resize images to match your layout dimensions. This is usually because image dimensions don\'t match your layout - use WordPress\' %1$snative responsive images feature%2$s or the plugin\'s Responsive Images settings to generate properly sized breakpoints for different screen sizes.', 'imagekit' ),
+						'<a href="https://make.wordpress.org/core/2015/11/10/responsive-images-in-wordpress-4-4/" target="_blank" rel="noopener noreferrer">',
+						'</a>'
+					),
+				),
+				array(
+					'type'        => 'panel',
+					'title'       => __( 'Does this plugin support custom CNAME?', 'imagekit' ),
+					'collapsible' => 'closed',
+					'content'     => __( 'Yes, you can email developer@imagekit.io to configure a custom CNAME for your account and then specify that in the plugin settings page.', 'imagekit' ),
+				),
+				array(
+					'type'        => 'panel',
+					'title'       => __( 'Can I configure this plugin to use ImageKit for custom upload directories?', 'imagekit' ),
+					'collapsible' => 'closed',
+					'content'     => __( 'Yes, you can specify any number of custom directory locations on the plugin settings page.', 'imagekit' ),
 				),
 			),
 		),
