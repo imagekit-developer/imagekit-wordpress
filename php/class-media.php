@@ -1608,10 +1608,10 @@ class Media extends Settings_Component implements Setup {
 			$config = array();
 		}
 
-		$pixel_step = ! empty( $config['pixel_step'] ) && is_numeric( $config['pixel_step'] ) ? (int) $config['pixel_step'] : 200;
-		$max_images = ! empty( $config['breakpoints'] ) && is_numeric( $config['breakpoints'] ) ? (int) $config['breakpoints'] : 20;
-		$max_width  = ! empty( $config['max_width'] ) && is_numeric( $config['max_width'] ) ? (int) $config['max_width'] : $full_width;
-		$min_width  = isset( $config['min_width'] ) && is_numeric( $config['min_width'] ) ? (int) $config['min_width'] : 200;
+		$pixel_step = ! empty( $config['pixel_step'] ) && is_numeric( $config['pixel_step'] ) ? (int) $config['pixel_step'] : 150;
+		$max_images = ! empty( $config['breakpoints'] ) && is_numeric( $config['breakpoints'] ) ? (int) $config['breakpoints'] : 15;
+		$max_width  = ! empty( $config['max_width'] ) && is_numeric( $config['max_width'] ) ? (int) $config['max_width'] : 3840;
+		$min_width  = isset( $config['min_width'] ) && is_numeric( $config['min_width'] ) ? (int) $config['min_width'] : 32;
 
 		$pixel_step = max( 50, $pixel_step );
 		$max_width  = min( $max_width, $full_width );

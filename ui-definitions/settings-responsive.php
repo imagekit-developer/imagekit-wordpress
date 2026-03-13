@@ -41,7 +41,7 @@ $settings = array(
 							'step' => 50,
 							'min'  => 50,
 						),
-						'default'      => 200,
+						'default'      => 150,
 					),
 					array(
 						'type'         => 'input',
@@ -52,6 +52,7 @@ $settings = array(
 							'imagekit'
 						),
 						'suffix'       => __( 'Recommended value: 3-40', 'imagekit' ),
+						'default'    => 15,
 						'attributes'   => array(
 							'type' => 'number',
 							'min'  => 3,
@@ -82,7 +83,7 @@ $settings = array(
 							'slug'       => 'min_width',
 							'prefix'     => __( 'Min', 'imagekit' ),
 							'suffix'     => __( 'px', 'imagekit' ),
-							'default'    => 200,
+							'default'    => 32,
 							'attributes' => array(
 								'type' => 'number',
 								'step' => 50,
