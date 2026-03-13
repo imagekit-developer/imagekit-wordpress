@@ -88,49 +88,34 @@ $imagekit->add_script_data( 'wizard', $data );
 				<section class="ik-wizard-panel is-active" id="ik-wizard-panel-1" data-step="1" role="tabpanel" tabindex="0" aria-labelledby="ik-wizard-tab-1">
 					<div class="ik-wizard-field">
 						<h3 class="ik-wizard-intro">
-							<?php esc_html_e( 'Welcome and thank you for installing the ImageKit plugin', 'imagekit' ); ?>
+							<?php esc_html_e( 'Make your WordPress site faster!', 'imagekit' ); ?>
 						</h3>
-					</div>
-
-					<div class="ik-wizard-field">
-						<div class="ik-wizard-split">
-							<div class="ik-wizard-copy">
-								<h4 class="ik-wizard-copy-title">
-									<?php esc_html_e( 'Deliver fast, optimized media on every page', 'imagekit' ); ?>
-								</h4>
-								<p class="ik-wizard-copy-text">
-									<?php esc_html_e( 'ImageKit helps you automatically optimize and deliver images and videos with built-in transformations, CDN delivery, and modern formats - so your site stays fast without extra effort.', 'imagekit' ); ?>
-								</p>
-								<ul class="ik-wizard-copy-list">
-									<li><?php esc_html_e( 'Serve images in next-gen formats like WebP and AVIF', 'imagekit' ); ?></li>
-									<li><?php esc_html_e( 'Optimize images automatically on delivery', 'imagekit' ); ?></li>
-									<li><?php esc_html_e( 'Keep your original WordPress media untouched', 'imagekit' ); ?></li>
-								</ul>
-								<p class="ik-wizard-copy-text">
-									<?php esc_html_e( 'Next, connect your ImageKit account to start optimizing your media.', 'imagekit' ); ?>
-								</p>
-							</div>
-
-							<div class="ik-wizard-graphic" role="img" aria-label="<?php esc_attr_e( 'Placeholder graphic', 'imagekit' ); ?>">
-								<span class="ik-wizard-graphic-label">
-									<?php esc_html_e( 'Graphic / image placeholder', 'imagekit' ); ?>
-								</span>
-							</div>
-						</div>
+						<p class="ik-wizard-copy-text">
+							<?php esc_html_e( 'Images and videos are slowing down your site. ImageKit fixes this automatically with no code changes or migration. Just connect and go.', 'imagekit' ); ?>
+						</p>
+						<ul class="ik-wizard-copy-list">
+							<li><?php esc_html_e( 'Works instantly with all your existing images and videos.', 'imagekit' ); ?></li>
+							<li><?php esc_html_e( 'Automatically delivers modern formats like WebP, AVIF, WebM etc.', 'imagekit' ); ?></li>
+							<li><?php esc_html_e( 'Optimizes every image and video during delivery via fast global CDN.', 'imagekit' ); ?></li>
+							<li><?php esc_html_e( 'Your original WordPress files stay safe and untouched.', 'imagekit' ); ?></li>
+						</ul>
+						<p class="ik-wizard-copy-text">
+							<?php esc_html_e( 'Connect your ImageKit account to get started.', 'imagekit' ); ?>
+						</p>
 					</div>
 				</section>
 
 				<section class="ik-wizard-panel" id="ik-wizard-panel-2" data-step="2" role="tabpanel" tabindex="0" aria-labelledby="ik-wizard-tab-2" hidden="hidden">
 					<div class="ik-wizard-field">
 						<h3 class="ik-wizard-intro">
-							<?php esc_html_e( 'Configure your ImageKit integration', 'imagekit' ); ?>
+							<?php esc_html_e( 'Connect your WordPress site to ImageKit', 'imagekit' ); ?>
 						</h3>
 					</div>
 
 					<div class="ik-wizard-field">
 						<div class="ik-wizard-note">
 							<p class="ik-wizard-copy-text">
-								<?php esc_html_e( 'Configure the URL endpoint to point to your WordPress website using the following steps in your ImageKit dashboard:', 'imagekit' ); ?>
+								<?php esc_html_e( 'First, add your WordPress site as an origin in your ImageKit dashboard:', 'imagekit' ); ?>
 							</p>
 							<ol class="ik-wizard-steps">
 								<li>
@@ -138,7 +123,7 @@ $imagekit->add_script_data( 'wizard', $data );
 									echo wp_kses_post(
 										sprintf(
 											/* translators: %s: URL to ImageKit external storage dashboard */
-											__( 'Go to the <a href="%s" target="_blank" rel="noopener noreferrer">external storage section</a> in your ImageKit dashboard. Under the Origins section, click on the Add origin button.', 'imagekit' ),
+											__( 'Open the <a href="%s" target="_blank" rel="noopener noreferrer">External storage section</a> in your ImageKit dashboard and click <strong>Add new</strong>.', 'imagekit' ),
 											esc_url( 'https://imagekit.io/dashboard/external-storage' )
 										)
 									);
@@ -149,37 +134,37 @@ $imagekit->add_script_data( 'wizard', $data );
 									echo wp_kses_post(
 										sprintf(
 											/* translators: %s: URL to web server origin documentation */
-											__( 'Choose <a href="%s" target="_blank" rel="noopener noreferrer">Web server</a> from the origin type dropdown.', 'imagekit' ),
-											esc_url( 'https://docs.imagekit.io/integration/configure-origin/web-server-origin' )
+											__( 'Select <a href="%s" target="_blank" rel="noopener noreferrer"><strong>Web Folder</strong></a> as the origin type.', 'imagekit' ),
+											esc_url( 'https://imagekit.io/docs/integration/web-server' )
 										)
 									);
 									?>
 								</li>
-								<li><?php esc_html_e( 'Give your origin a name (it will appear in the list of origins you have added).', 'imagekit' ); ?></li>
+								<li><?php esc_html_e( 'Enter a name for this origin (e.g., "My WordPress Site").', 'imagekit' ); ?></li>
 								<li>
 									<?php
 									echo wp_kses_post(
 										sprintf(
 											/* translators: %s: WordPress site URL */
-											__( 'Fill out the base URL as your WordPress site URL: <code>%s</code>', 'imagekit' ),
+											__( 'Set the <strong>Base URL</strong> to your WordPress site URL: <code>%s</code>', 'imagekit' ),
 											esc_html( home_url( '/' ) )
 										)
 									);
 									?>
 								</li>
-								<li>
-									<?php
-									echo wp_kses_post(
-										sprintf(
-											/* translators: %s: URL to advanced options documentation */
-											__( 'To configure advanced options, refer <a href="%s" target="_blank" rel="noopener noreferrer">here</a>.', 'imagekit' ),
-											esc_url( 'https://docs.imagekit.io/integration/configure-origin/web-server-origin#advanced-options-for-web-server-origin' )
-										)
-									);
-									?>
-								</li>
-								<li><?php esc_html_e( 'Click on Submit.', 'imagekit' ); ?></li>
+								<li><?php esc_html_e( 'Leave other settings at default and click Submit.', 'imagekit' ); ?></li>
 							</ol>
+							<p class="ik-wizard-copy-text">
+								<?php
+								echo wp_kses_post(
+									sprintf(
+										/* translators: %s: URL to advanced options documentation */
+										__( 'Need to configure advanced options like authentication? <a href="%s" target="_blank" rel="noopener noreferrer">See the documentation</a>.', 'imagekit' ),
+										esc_url( 'https://imagekit.io/docs/integration/web-server#advanced-options-for-web-server-origin' )
+									)
+								);
+								?>
+							</p>
 						</div>
 					</div>
 
@@ -240,7 +225,7 @@ $imagekit->add_script_data( 'wizard', $data );
 									echo wp_kses_post(
 										sprintf(
 											/* translators: %s: URL to ImageKit developer dashboard */
-											__( 'Enter the URL endpoint, public key, and private key from your ImageKit dashboard. You can find these in your ImageKit dashboard under the <a href="%s" target="_blank" rel="noopener noreferrer">Developer section</a>.', 'imagekit' ),
+											__( 'Find your credentials in the <a href="%s" target="_blank" rel="noopener noreferrer">Developer section</a> of your ImageKit dashboard. Copy the <strong>URL endpoint</strong>, <strong>Public key</strong>, and <strong>Private key</strong> and paste them above.', 'imagekit' ),
 											esc_url( 'https://imagekit.io/dashboard/developer/api-keys' )
 										)
 									);
