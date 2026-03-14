@@ -5,6 +5,9 @@ on:
     types:
       - created
       
+permissions:
+  contents: write
+
 jobs:
   tag:
     name: New tag
