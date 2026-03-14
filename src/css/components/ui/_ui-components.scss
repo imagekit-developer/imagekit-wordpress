@@ -1,0 +1,25 @@
+&-ui {
+
+
+	&-wrap {
+		.closed {
+			display: none;
+		}
+	}
+
+
+	&-title {
+		font-size: $size-panel-subtitle;
+
+		h2 {
+			font-size: $size-panel-title;
+			font-weight: bold;
+			margin: 6px 0 1px;
+		}
+
+
+		&.collapsible {
+			cursor: pointer;
+		}
+	}
+}

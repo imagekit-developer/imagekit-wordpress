@@ -1,0 +1,13 @@
+{
+    "intelephense.environment.includePaths": [
+        "/var/www/html",
+        "/var/www/html/wp-includes",
+        "/var/www/html/wp-admin/includes"
+    ],
+    "intelephense.files.maxMemory": 4096,
+    "php.stubs": [
+        "pcntl",
+        "wordpress",
+        "*"
+    ]
+}
