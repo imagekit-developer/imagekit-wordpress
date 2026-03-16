@@ -82,7 +82,7 @@ class Media extends Settings_Component implements Setup {
 		}
 
 		$this->base_url        = rtrim( $url_endpoint, '/' );
-		$this->imagekit_folder = $this->settings->get_value( slugs: 'imagekit_folder' );
+		$this->imagekit_folder = $this->settings->get_value( 'imagekit_folder' );
 		$this->delivery        = $this->plugin->get_component( 'delivery' );
 		$this->rewriter        = new Rewriter( $this->plugin, $this->settings, $this->base_url, $this->imagekit_folder );
 		$this->asset_rewriter  = new Asset_Rewriter( $this->plugin, $this->delivery, $this->base_url );
@@ -104,10 +104,10 @@ class Media extends Settings_Component implements Setup {
 		$this->credentials = $this->plugin->get_component( 'credentials_manager' )->get_credentials();
 		$this->uploader    = $this->plugin->get_component( 'uploader' );
 
-		add_action( 'print_media_templates', callback: array( $this, 'media_template' ) );
+		add_action( 'print_media_templates', array( $this, 'media_template' ) );
 		add_action( 'wp_enqueue_media', array( $this, 'editor_assets' ) );
 		add_action( 'enqueue_block_editor_assets', array( $this, 'block_editor_assets' ) );
-		add_action( 'wp_ajax_imagekit-down-sync', callback: array( $this, 'down_sync_asset' ) );
+		add_action( 'wp_ajax_imagekit-down-sync', array( $this, 'down_sync_asset' ) );
 		add_action( 'imagekit_download_asset', array( $this, 'maybe_copy_eml_asset_to_wordpress' ), 10, 2 );
 		add_filter( 'imagekit_api_rest_endpoints', array( $this, 'rest_endpoints' ) );
 

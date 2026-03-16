@@ -14,7 +14,7 @@
 
 namespace ImageKitWordpress;
 
-if ( ! defined( constant_name: 'ABSPATH' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 

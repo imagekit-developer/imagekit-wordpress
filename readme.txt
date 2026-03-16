@@ -93,6 +93,9 @@ This is because image dimensions are not as per the layout. We could have done i
 
 == Changelog ==
 
+= 5.0.1 =
+* Fixed PHP named arguments compatibility issue.
+
 = 5.0.0 =
 * Complete plugin rewrite with modern architecture using PHP namespaces and OOP design.
 * New setup wizard with guided onboarding and credential prefill support.
