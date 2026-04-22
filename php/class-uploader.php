@@ -16,7 +16,7 @@ use ImageKitWordpress\Component\Setup;
 class Uploader extends Settings_Component implements Setup, Assets {
 
 	const DEFAULT_LOWRES_MAX_WIDTH = 1920;
-	const DEFAULT_LOWRES_QUALITY   = 82;
+	const DEFAULT_LOWRES_QUALITY   = 75;
 
 	/**
 	 * Holds the plugin instance.
@@ -326,6 +326,31 @@ class Uploader extends Settings_Component implements Setup, Assets {
 		require_once ABSPATH . 'wp-admin/includes/image.php';
 		require_once ABSPATH . 'wp-admin/includes/file.php';
 
+		/**
+		 * Filter the maximum width used when downscaling the local copy in
+		 * "ImageKit and WordPress (low resolution)" mode.
+		 *
+		 * @since 5.0.2
+		 *
+		 * @param int $max_width     Default maximum width in pixels.
+		 * @param int $attachment_id The attachment being processed.
+		 * @param string $file       Absolute path to the local source file.
+		 */
+		$max_width = (int) apply_filters( 'imagekit_lowres_max_width', self::DEFAULT_LOWRES_MAX_WIDTH, $attachment_id, $file );
+		$max_width = $max_width > 0 ? $max_width : self::DEFAULT_LOWRES_MAX_WIDTH;
+
+		/**
+		 * Filter the JPEG quality used when re-encoding the local low-res copy.
+		 *
+		 * @since 5.0.2
+		 *
+		 * @param int $quality       Default quality (1-100).
+		 * @param int $attachment_id The attachment being processed.
+		 * @param string $file       Absolute path to the local source file.
+		 */
+		$quality = (int) apply_filters( 'imagekit_lowres_quality', self::DEFAULT_LOWRES_QUALITY, $attachment_id, $file );
+		$quality = max( 1, min( 100, $quality ) );
+
 		$editor = wp_get_image_editor( $file );
 		if ( is_wp_error( $editor ) ) {
 			return;
@@ -333,15 +358,21 @@ class Uploader extends Settings_Component implements Setup, Assets {
 
 		$size = $editor->get_size();
 		if ( is_array( $size ) && ! empty( $size['width'] ) && is_numeric( $size['width'] ) ) {
-			if ( (int) $size['width'] > self::DEFAULT_LOWRES_MAX_WIDTH ) {
-				$editor->resize( self::DEFAULT_LOWRES_MAX_WIDTH, null, false );
+			if ( (int) $size['width'] > $max_width ) {
+				$resized = $editor->resize( $max_width, null, false );
+				if ( is_wp_error( $resized ) ) {
+					return;
+				}
 			}
 		}
 
 		if ( method_exists( $editor, 'set_quality' ) ) {
-			$editor->set_quality( self::DEFAULT_LOWRES_QUALITY );
+			$editor->set_quality( $quality );
 		}
-		$editor->save( $file );
+		$saved = $editor->save( $file );
+		if ( is_wp_error( $saved ) ) {
+			return;
+		}
 
 		// Regenerate metadata so sizes are based on the low-res original.
 		$meta = wp_generate_attachment_metadata( $attachment_id, $file );

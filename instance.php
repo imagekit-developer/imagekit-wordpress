@@ -10,6 +10,7 @@ namespace ImageKitWordpress;
 global $imagekit_plugin;
 
 require_once __DIR__ . '/php/class-plugin.php';
+require_once __DIR__ . '/php/public-functions.php';
 
 $imagekit_plugin = new Plugin();
 

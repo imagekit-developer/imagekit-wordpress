@@ -37,6 +37,63 @@ $settings = array(
 				array(
 					'type' => 'group',
 					array(
+						'type'         => 'input',
+						'slug'         => 'video_quality',
+						'title'        => __( 'Video quality', 'imagekit' ),
+						'tooltip_text' => __(
+							'Set the quality of delivered videos (1-100). Lower values reduce file size but also reduce visual quality. Leave empty to use ImageKit defaults.',
+							'imagekit'
+						),
+						'default'      => '',
+						'suffix'       => __( '1-100', 'imagekit' ),
+						'attributes'   => array(
+							'type'         => 'number',
+							'min'          => 1,
+							'max'          => 100,
+							'data-context' => 'video',
+							'placeholder'  => 'Auto',
+						),
+					),
+					array(
+						'type'         => 'select',
+						'slug'         => 'video_format',
+						'title'        => __( 'Video format', 'imagekit' ),
+						'tooltip_text' => __(
+							'Convert videos to a specific format for delivery. "Auto" lets ImageKit choose the best format based on the viewer\'s browser. MP4 (H.264) has the widest compatibility. WebM (VP9) offers better compression for supported browsers.',
+							'imagekit'
+						),
+						'default'      => '',
+						'attributes'   => array(
+							'data-context' => 'video',
+						),
+						'options'      => array(
+							''     => __( 'Auto (recommended)', 'imagekit' ),
+							'mp4'  => __( 'MP4 (H.264)', 'imagekit' ),
+							'webm' => __( 'WebM (VP9)', 'imagekit' ),
+						),
+					),
+					array(
+						'type'               => 'toggle',
+						'slug'               => 'video_thumbnail',
+						'title'              => __( 'Auto-generate poster', 'imagekit' ),
+						'tooltip_text'       => __(
+							'Automatically generate a poster thumbnail for videos using ImageKit. This provides a preview image before the video plays, improving perceived performance.',
+							'imagekit'
+						),
+						'description'        => __( 'Generate poster thumbnails from video frames.', 'imagekit' ),
+						'default'            => 'off',
+						'attributes'         => array(
+							'data-context' => 'video',
+						),
+					),
+				),
+				array(
+					'type'    => 'tag',
+					'element' => 'hr',
+				),
+				array(
+					'type' => 'group',
+					array(
 						'type'           => 'input',
 						'slug'           => 'video_freeform',
 						'title'          => 'Global video transformations',

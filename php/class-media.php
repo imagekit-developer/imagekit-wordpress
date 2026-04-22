@@ -119,6 +119,7 @@ class Media extends Settings_Component implements Setup {
 		add_filter( 'wp_content_img_tag', array( $this, 'maybe_add_imagekit_srcset' ), 20, 3 );
 
 		add_filter( 'imagekit_default_global_transformations_image', array( $this, 'default_image_global_transformations' ), 10 );
+		add_filter( 'imagekit_default_global_transformations_video', array( $this, 'default_video_global_transformations' ), 10 );
 	}
 
 	public function maybe_start_output_buffer_rewrite() {
@@ -1159,9 +1160,82 @@ class Media extends Settings_Component implements Setup {
 				$this->url_map[ $url ] = $ik_url;
 				$this->populate_sized_variant_url_map( $post_id, $url, $ik_url );
 			}
+			// For video attachments, apply global video transforms so the returned
+			// URL honors the user-configured video quality/format/freeform transforms.
+			if ( is_string( $ik_url ) && '' !== $ik_url && $this->is_video_attachment( $post_id ) ) {
+				$ik_url = $this->apply_video_global_transforms( $ik_url );
+			}
 			return $ik_url;
 		}
 		return $url;
+	}
+
+	/**
+	 * Check whether the attachment is a video asset.
+	 *
+	 * @param int $attachment_id Attachment ID.
+	 *
+	 * @return bool
+	 */
+	private function is_video_attachment( $attachment_id ) {
+		$delivery = $this->get_post_meta( $attachment_id, '_imagekit_delivery', true );
+		if ( is_string( $delivery ) && 'video' === $delivery ) {
+			return true;
+		}
+		$mime = (string) get_post_mime_type( $attachment_id );
+		return '' !== $mime && 0 === strpos( $mime, 'video/' );
+	}
+
+	/**
+	 * Append the global video transforms to an ImageKit video URL.
+	 *
+	 * Existing `tr` param (if any) is preserved as the base segment; the
+	 * video globals are added either to that segment or as a new chained
+	 * segment so existing transforms keep their precedence semantics.
+	 *
+	 * @param string $url ImageKit URL.
+	 *
+	 * @return string
+	 */
+	private function apply_video_global_transforms( $url ) {
+		$video_tr = apply_filters( 'imagekit_default_global_transformations_video', array() );
+		$video_tr = is_array( $video_tr ) ? array_map( 'trim', $video_tr ) : array();
+		$video_tr = array_values(
+			array_filter(
+				$video_tr,
+				static function ( $t ) {
+					return is_string( $t ) && '' !== $t;
+				}
+			)
+		);
+		if ( empty( $video_tr ) ) {
+			return $url;
+		}
+
+		$existing_tr = '';
+		$existing_q  = wp_parse_url( $url, PHP_URL_QUERY );
+		if ( is_string( $existing_q ) && '' !== $existing_q ) {
+			parse_str( $existing_q, $existing_query_args );
+			if ( is_array( $existing_query_args ) && ! empty( $existing_query_args['tr'] ) && is_string( $existing_query_args['tr'] ) ) {
+				$existing_tr = $existing_query_args['tr'];
+			}
+		}
+
+		if ( '' === $existing_tr ) {
+			return add_query_arg( 'tr', implode( ',', $video_tr ), $url );
+		}
+
+		// Merge into first segment, skipping tokens that already exist.
+		$segments = explode( ':', $existing_tr );
+		$first    = array_map( 'trim', explode( ',', $segments[0] ) );
+		foreach ( $video_tr as $tok ) {
+			if ( ! in_array( $tok, $first, true ) ) {
+				$first[] = $tok;
+			}
+		}
+		$segments[0] = implode( ',', array_values( array_filter( $first ) ) );
+
+		return add_query_arg( 'tr', implode( ':', $segments ), $url );
 	}
 
 	/**
@@ -1386,7 +1460,7 @@ class Media extends Settings_Component implements Setup {
 		}
 
 		$srcset_attr = implode( ', ', $srcset_entries );
-		$sizes_attr  = sprintf( '(max-width: %1$dpx) 100vw, %1$dpx', $display_width );
+		$sizes_attr  = $this->build_sizes_attr_from_settings( $display_width );
 
 		// Insert srcset and sizes before the closing /> or >.
 		$filtered_image = preg_replace(
@@ -1592,6 +1666,30 @@ class Media extends Settings_Component implements Setup {
 		return $default;
 	}
 
+	public function default_video_global_transformations( $default ) {
+
+		$config = $this->settings->get_value( 'media_display' );
+
+		if ( ! empty( $config['video_quality'] ) && is_numeric( $config['video_quality'] ) ) {
+			$default[] = 'q-' . (int) $config['video_quality'];
+		}
+		if ( ! empty( $config['video_format'] ) && is_string( $config['video_format'] ) && '' !== $config['video_format'] ) {
+			$default[] = 'f-' . $config['video_format'];
+		}
+		if ( ! empty( $config['video_freeform'] ) && is_string( $config['video_freeform'] ) ) {
+			$parts   = array_map( 'trim', explode( ',', $config['video_freeform'] ) );
+			$parts   = array_filter(
+				$parts,
+				static function ( $t ) {
+					return is_string( $t ) && '' !== $t;
+				}
+			);
+			$default = array_merge( $default, array_values( $parts ) );
+		}
+
+		return $default;
+	}
+
 	/**
 	 * Generate srcset widths from the responsive images settings.
 	 *
@@ -1724,35 +1822,53 @@ class Media extends Settings_Component implements Setup {
 			}
 		}
 
-		$transforms = apply_filters( 'imagekit_default_global_transformations_image', array() );
-		$transforms = is_array( $transforms ) ? array_map( 'trim', $transforms ) : array();
-		$transforms = array_filter(
-			$transforms,
-			static function ( $t ) {
-				return is_string( $t ) && '' !== $t;
-			}
-		);
-		if ( '' !== $existing_tr ) {
-			$existing_parts = array_map( 'trim', explode( ',', $existing_tr ) );
-			$existing_parts = array_filter(
-				$existing_parts,
+		$globals = apply_filters( 'imagekit_default_global_transformations_image', array() );
+		$globals = is_array( $globals ) ? array_map( 'trim', $globals ) : array();
+		$globals = array_values(
+			array_filter(
+				$globals,
 				static function ( $t ) {
 					return is_string( $t ) && '' !== $t;
 				}
+			)
+		);
+
+		$existing_parts = array();
+		if ( '' !== $existing_tr ) {
+			// Preserve any pre-existing chained segments (split on ':' to avoid flattening).
+			$existing_parts = array_map( 'trim', explode( ',', $existing_tr ) );
+			$existing_parts = array_values(
+				array_filter(
+					$existing_parts,
+					static function ( $t ) {
+						return is_string( $t ) && '' !== $t;
+					}
+				)
 			);
-			$transforms     = array_merge( $existing_parts, $transforms );
 		}
 
+		$srcset_parts = array();
 		if ( null !== $width && is_numeric( $width ) && (int) $width > 0 ) {
-			$transforms[] = 'w-' . (int) $width;
+			$srcset_parts[] = 'w-' . (int) $width;
 		}
 		if ( null !== $height && is_numeric( $height ) && (int) $height > 0 ) {
-			$transforms[] = 'h-' . (int) $height;
+			$srcset_parts[] = 'h-' . (int) $height;
 		}
 
-		$transforms = array_values( array_unique( $transforms ) );
-		if ( ! empty( $transforms ) ) {
-			$imagekit_url = add_query_arg( 'tr', implode( ',', $transforms ), $imagekit_url );
+		// Base segment: existing tr + globals (globals run first on the source).
+		$base_segment = array_values( array_unique( array_merge( $existing_parts, $globals ) ) );
+
+		$segments = array();
+		if ( ! empty( $base_segment ) ) {
+			$segments[] = implode( ',', $base_segment );
+		}
+		if ( ! empty( $srcset_parts ) ) {
+			// Chain srcset dimensions AFTER globals so they always win regardless of globals.
+			$segments[] = implode( ',', $srcset_parts );
+		}
+
+		if ( ! empty( $segments ) ) {
+			$imagekit_url = add_query_arg( 'tr', implode( ':', $segments ), $imagekit_url );
 		}
 
 		return $imagekit_url;
@@ -1925,5 +2041,43 @@ class Media extends Settings_Component implements Setup {
 		}
 
 		return $converted;
+	}
+
+	/**
+	 * Build the sizes attribute value from the plugin's responsive settings.
+	 *
+	 * When sizes_mode is 'viewport', uses the S/M/L/XL viewport presets.
+	 * Otherwise, falls back to the standard max-width pattern.
+	 *
+	 * @param int $display_width The display width of the image.
+	 *
+	 * @return string
+	 */
+	private function build_sizes_attr_from_settings( $display_width ) {
+		$config = $this->plugin->settings->get_value( 'media_display' );
+		if ( ! is_array( $config ) ) {
+			$config = array();
+		}
+
+		if ( ! empty( $config['sizes_mode'] ) && 'viewport' === $config['sizes_mode'] ) {
+			$presets = array(
+				array( 'key' => 'size_s', 'media' => '(max-width: 640px)',  'default' => '100vw' ),
+				array( 'key' => 'size_m', 'media' => '(max-width: 1024px)', 'default' => '75vw' ),
+				array( 'key' => 'size_l', 'media' => '(max-width: 1440px)', 'default' => '50vw' ),
+			);
+
+			$parts = array();
+			foreach ( $presets as $preset ) {
+				$value   = ! empty( $config[ $preset['key'] ] ) ? (string) $config[ $preset['key'] ] : $preset['default'];
+				$parts[] = $preset['media'] . ' ' . $value;
+			}
+
+			$xl      = ! empty( $config['size_xl'] ) ? (string) $config['size_xl'] : $display_width . 'px';
+			$parts[] = $xl;
+
+			return implode( ', ', $parts );
+		}
+
+		return sprintf( '(max-width: %1$dpx) 100vw, %1$dpx', $display_width );
 	}
 }

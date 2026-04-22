@@ -75,6 +75,18 @@ class Credentials_Manager extends Settings_Component implements Config, Setup {
 	const LEGACY_OPTION = 'imagekit_settings';
 
 	/**
+	 * Map of legacy v4.x field names to their v5.x equivalents.
+	 *
+	 * External code that accessed old option keys will receive the correct
+	 * value alongside a deprecation notice so developers can update their code.
+	 */
+	const LEGACY_FIELD_MAP = array(
+		'imagekit_url_endpoint' => 'url_endpoint',
+		'cname'                 => 'url_endpoint',
+		'imagekit_id'           => 'url_endpoint',
+	);
+
+	/**
 	 * Initiate the plugin resources.
 	 *
 	 * @param \ImageKitWordpress\Plugin $plugin Instance of the plugin.
@@ -86,6 +98,7 @@ class Credentials_Manager extends Settings_Component implements Config, Setup {
 		add_action( 'imagekit_version_upgrade', array( $this, 'upgrade_connection' ) );
 		add_filter( 'imagekit_settings_pages', array( $this, 'register_meta' ) );
 		add_filter( 'imagekit_api_rest_endpoints', array( $this, 'rest_endpoints' ) );
+		add_filter( 'pre_option_' . self::LEGACY_OPTION, array( $this, 'intercept_legacy_option' ), 10, 3 );
 	}
 
 	/**
@@ -644,6 +657,72 @@ class Credentials_Manager extends Settings_Component implements Config, Setup {
 		$this->api = $test;
 
 		return $test->ping();
+	}
+
+	/**
+	 * Intercept reads of the legacy `imagekit_settings` option.
+	 *
+	 * When external code calls get_option('imagekit_settings'), this filter
+	 * returns the current v5.x credentials in a shape that v4.x consumers
+	 * expect, alongside a deprecation notice.
+	 *
+	 * @param mixed  $pre_option  Value to return instead of the option value (false = do not intercept).
+	 * @param string $option      Option name.
+	 * @param mixed  $default     The fallback value.
+	 *
+	 * @return mixed
+	 */
+	public function intercept_legacy_option( $pre_option, $option = '', $default = false ) {
+		if ( self::LEGACY_OPTION !== $option ) {
+			return $pre_option;
+		}
+
+		_deprecated_argument(
+			'get_option( \'' . self::LEGACY_OPTION . '\' )',
+			'5.0.0',
+			sprintf(
+				'The "%s" option is deprecated. Use imagekit_get_url_endpoint() or the ImageKit Public API functions instead.',
+				self::LEGACY_OPTION
+			)
+		);
+
+		$url_endpoint = $this->get_url_endpoint();
+		if ( empty( $url_endpoint ) ) {
+			return $default;
+		}
+
+		// Return a shape that matches what v4.x code would expect.
+		return array(
+			'imagekit_url_endpoint' => $url_endpoint,
+			'cname'                 => $url_endpoint,
+		);
+	}
+
+	/**
+	 * Get a credential value, accepting both legacy and current field names.
+	 *
+	 * If a legacy field name is used, a deprecation notice is emitted and the
+	 * value is resolved from the current credentials.
+	 *
+	 * @param string $field The field name (legacy or current).
+	 *
+	 * @return string|null The credential value, or null if not found.
+	 */
+	public function get_credential( $field ) {
+		if ( isset( self::LEGACY_FIELD_MAP[ $field ] ) ) {
+			_deprecated_argument(
+				__METHOD__,
+				'5.0.0',
+				sprintf(
+					'Credential field "%s" is deprecated. Use "%s" or imagekit_get_url_endpoint() instead.',
+					$field,
+					self::LEGACY_FIELD_MAP[ $field ]
+				)
+			);
+			$field = self::LEGACY_FIELD_MAP[ $field ];
+		}
+
+		return isset( $this->credentials[ $field ] ) ? $this->credentials[ $field ] : null;
 	}
 
 	public function verify_connection( $data ) {

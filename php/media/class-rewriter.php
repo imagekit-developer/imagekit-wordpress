@@ -129,7 +129,13 @@ class Rewriter {
 			if ( ! $source ) {
 				continue;
 			}
-			$this->rewrite_element_attrs( $source, array(), array( 'srcset', 'data-srcset' ) );
+			// A <source> inside <video> needs video-context transforms applied to its src.
+			$is_video_source = ( $source->parentNode && 'video' === strtolower( $source->parentNode->nodeName ) );
+			if ( $is_video_source ) {
+				$this->rewrite_element_attrs( $source, array( 'src' ), array(), 'video' );
+			} else {
+				$this->rewrite_element_attrs( $source, array(), array( 'srcset', 'data-srcset' ) );
+			}
 		}
 
 		$videos = $doc->getElementsByTagName( 'video' );
@@ -138,7 +144,9 @@ class Rewriter {
 			if ( ! $video ) {
 				continue;
 			}
-			$this->rewrite_element_attrs( $video, array( 'poster' ), array() );
+			// <video src="..."> and <video poster="..."> both get video-context transforms.
+			$this->rewrite_element_attrs( $video, array( 'src', 'poster' ), array(), 'video' );
+			$this->maybe_add_auto_poster( $video );
 		}
 
 		$out = $doc->saveHTML();
@@ -147,13 +155,13 @@ class Rewriter {
 		return is_string( $out ) ? $out : null;
 	}
 
-	protected function rewrite_element_attrs( $el, $url_attrs, $srcset_attrs ) {
+	protected function rewrite_element_attrs( $el, $url_attrs, $srcset_attrs, $context = 'image' ) {
 		foreach ( $url_attrs as $attr ) {
 			if ( ! $el->hasAttribute( $attr ) ) {
 				continue;
 			}
 			$old = (string) $el->getAttribute( $attr );
-			$new = $this->rewrite_url( $old );
+			$new = $this->rewrite_url( $old, $context );
 			if ( is_string( $new ) && '' !== $new && $new !== $old ) {
 				$el->setAttribute( $attr, $new );
 			}
@@ -186,6 +194,40 @@ class Rewriter {
 			$html
 		);
 
+		// Rewrite entire <video>...</video> blocks first so <source>/<video src> inside get video-context transforms.
+		$html = preg_replace_callback(
+			'#<video\b[^>]*>.*?</video>#is',
+			static function ( $m ) use ( $self ) {
+				$block = $m[0];
+				// Rewrite the opening <video ...> tag: src, poster with video context.
+				$block = preg_replace_callback(
+					'#<video\b[^>]*>#i',
+					static function ( $m2 ) use ( $self ) {
+						$tag = $m2[0];
+						$tag = $self->rewrite_tag_attr( $tag, 'src', 'video' );
+						$tag = $self->rewrite_tag_attr( $tag, 'poster', 'video' );
+						$tag = $self->maybe_add_auto_poster_regex( $tag );
+						return $tag;
+					},
+					$block,
+					1
+				);
+				// Rewrite any <source> elements inside the <video> with video context on src.
+				$block = preg_replace_callback(
+					'#<source\b[^>]*>#i',
+					static function ( $m2 ) use ( $self ) {
+						$tag = $m2[0];
+						$tag = $self->rewrite_tag_attr( $tag, 'src', 'video' );
+						return $tag;
+					},
+					$block
+				);
+				return $block;
+			},
+			$html
+		);
+
+		// Non-video <source> elements (e.g. inside <picture>) keep the existing srcset handling.
 		$html = preg_replace_callback(
 			'#<source\b[^>]*>#i',
 			static function ( $m ) use ( $self ) {
@@ -197,25 +239,17 @@ class Rewriter {
 			$html
 		);
 
-		return preg_replace_callback(
-			'#<video\b[^>]*>#i',
-			static function ( $m ) use ( $self ) {
-				$tag = $m[0];
-				$tag = $self->rewrite_tag_attr( $tag, 'poster' );
-				return $tag;
-			},
-			$html
-		);
+		return $html;
 	}
 
-	protected function rewrite_tag_attr( $tag, $attr ) {
+	public function rewrite_tag_attr( $tag, $attr, $context = 'image' ) {
 		$pattern = '#\b' . preg_quote( $attr, '#' ) . '\s*=\s*(["\'])\s*([^"\']+)\s*\1#i';
 		return preg_replace_callback(
 			$pattern,
-			function ( $m ) use ( $attr ) {
+			function ( $m ) use ( $attr, $context ) {
 				$q   = $m[1];
 				$url = $m[2];
-				$new = $this->rewrite_url( $url );
+				$new = $this->rewrite_url( $url, $context );
 				if ( ! is_string( $new ) || '' === $new ) {
 					return $m[0];
 				}
@@ -268,7 +302,7 @@ class Rewriter {
 		return implode( ', ', $out );
 	}
 
-	protected function rewrite_url( $url ) {
+	protected function rewrite_url( $url, $context = 'image' ) {
 		if ( ! is_string( $url ) || '' === $url ) {
 			return $url;
 		}
@@ -278,16 +312,16 @@ class Rewriter {
 		if ( 'to_wp' === $this->direction ) {
 			return $this->rewrite_imagekit_url_to_wp_if_local( $url );
 		}
-		return $this->rewrite_wp_url_to_imagekit( $url );
+		return $this->rewrite_wp_url_to_imagekit( $url, $context );
 	}
 
-	protected function rewrite_wp_url_to_imagekit( $url ) {
+	protected function rewrite_wp_url_to_imagekit( $url, $context = 'image' ) {
 		$base = trim( (string) $this->base_url );
 		if ( '' === $base ) {
 			return $url;
 		}
 		if ( $this->is_imagekit_url( $url ) ) {
-			return $this->apply_transforms( $url, array() );
+			return $this->apply_transforms( $url, array(), $context );
 		}
 
 		$relative = $this->get_uploads_relative_path_from_url( $url );
@@ -308,7 +342,7 @@ class Rewriter {
 		}
 
 		$new = rtrim( $base, '/' ) . '/' . ltrim( $path, '/' );
-		return $this->apply_transforms( $new, $extra_tr );
+		return $this->apply_transforms( $new, $extra_tr, $context );
 	}
 
 	protected function rewrite_imagekit_url_to_wp_if_local( $url ) {
@@ -452,8 +486,9 @@ class Rewriter {
 		return '';
 	}
 
-	protected function apply_transforms( $url, $extra_transforms ) {
-		$transforms       = apply_filters( 'imagekit_default_global_transformations_image', array() );
+	protected function apply_transforms( $url, $extra_transforms, $context = 'image' ) {
+		$filter_name      = 'video' === $context ? 'imagekit_default_global_transformations_video' : 'imagekit_default_global_transformations_image';
+		$transforms       = apply_filters( $filter_name, array() );
 		$transforms       = is_array( $transforms ) ? array_map( 'trim', $transforms ) : array();
 		$transforms       = array_filter(
 			$transforms,
@@ -495,5 +530,102 @@ class Rewriter {
 			return $url;
 		}
 		return add_query_arg( 'tr', implode( ',', $transforms ), $url );
+	}
+
+	/**
+	 * Auto-generate a poster attribute for a <video> element (DOM path).
+	 *
+	 * When the video_thumbnail setting is enabled and the video has no poster,
+	 * generates a thumbnail URL from the video's first <source> src using
+	 * ImageKit's video-to-image thumbnail transform.
+	 *
+	 * @param \DOMElement $video The video element.
+	 */
+	protected function maybe_add_auto_poster( $video ) {
+		if ( 'to_wp' === $this->direction ) {
+			return;
+		}
+		if ( $video->hasAttribute( 'poster' ) && '' !== trim( (string) $video->getAttribute( 'poster' ) ) ) {
+			return;
+		}
+		if ( ! $this->is_auto_poster_enabled() ) {
+			return;
+		}
+
+		$src = $this->get_video_source_url( $video );
+		if ( '' === $src ) {
+			return;
+		}
+
+		$poster = $this->build_video_poster_url( $src );
+		if ( '' !== $poster ) {
+			$video->setAttribute( 'poster', $poster );
+		}
+	}
+
+	/**
+	 * Auto-generate a poster attribute for a <video> tag (regex path).
+	 *
+	 * @param string $tag The <video> opening tag.
+	 *
+	 * @return string Modified tag with poster if applicable.
+	 */
+	protected function maybe_add_auto_poster_regex( $tag ) {
+		if ( 'to_wp' === $this->direction ) {
+			return $tag;
+		}
+		if ( preg_match( '/\bposter\s*=/', $tag ) ) {
+			return $tag;
+		}
+		if ( ! $this->is_auto_poster_enabled() ) {
+			return $tag;
+		}
+		// Cannot reliably extract <source> from the opening tag alone in regex mode.
+		return $tag;
+	}
+
+	protected function is_auto_poster_enabled() {
+		if ( ! $this->settings ) {
+			return false;
+		}
+		$config = $this->settings->get_value( 'media_display' );
+		return is_array( $config ) && ! empty( $config['video_thumbnail'] ) && 'on' === $config['video_thumbnail'];
+	}
+
+	protected function get_video_source_url( $video ) {
+		if ( $video->hasAttribute( 'src' ) ) {
+			$src = trim( (string) $video->getAttribute( 'src' ) );
+			if ( '' !== $src ) {
+				return $src;
+			}
+		}
+		$sources = $video->getElementsByTagName( 'source' );
+		if ( $sources->length > 0 ) {
+			$first = $sources->item( 0 );
+			if ( $first && $first->hasAttribute( 'src' ) ) {
+				return trim( (string) $first->getAttribute( 'src' ) );
+			}
+		}
+		return '';
+	}
+
+	protected function build_video_poster_url( $video_url ) {
+		if ( ! is_string( $video_url ) || '' === $video_url ) {
+			return '';
+		}
+		// If it's already an ImageKit URL, add ik-thumbnail.jpg suffix.
+		if ( $this->is_imagekit_url( $video_url ) ) {
+			$parsed = wp_parse_url( $video_url );
+			if ( empty( $parsed['path'] ) ) {
+				return '';
+			}
+			$parsed['path'] = rtrim( $parsed['path'], '/' ) . '/ik-thumbnail.jpg';
+			$poster  = '';
+			$poster .= isset( $parsed['scheme'] ) ? $parsed['scheme'] . '://' : '';
+			$poster .= isset( $parsed['host'] ) ? $parsed['host'] : '';
+			$poster .= $parsed['path'];
+			return $poster;
+		}
+		return '';
 	}
 }

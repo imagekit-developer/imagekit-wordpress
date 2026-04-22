@@ -277,6 +277,7 @@ final class Plugin {
 		$this->components['delivery']            = new Delivery( $this );
 		$this->components['media']               = new Media( $this );
 		$this->components['rest_api']            = new REST_API( $this );
+		$this->components['public_api']          = new Public_API( $this );
 	}
 
 
