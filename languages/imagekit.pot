@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: ImageKit STABLETAG\n"
 "Report-Msgid-Bugs-To: "
 "https://github.com/imagekit-developer/imagekit-wordpress\n"
-"POT-Creation-Date: 2026-03-13 19:55:58+00:00\n"
+"POT-Creation-Date: 2026-04-22 12:07:44+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -31,35 +31,35 @@ msgid ""
 "You must be running PHP 5.6 or higher"
 msgstr ""
 
-#: php/class-credentials-manager.php:147
+#: php/class-credentials-manager.php:160
 msgid "Unable to verify connection."
 msgstr ""
 
-#: php/class-credentials-manager.php:360 php/class-credentials-manager.php:382
-#: php/class-credentials-manager.php:395
+#: php/class-credentials-manager.php:373 php/class-credentials-manager.php:395
+#: php/class-credentials-manager.php:408
 msgid "Validation failed"
 msgstr ""
 
-#: php/class-credentials-manager.php:364
+#: php/class-credentials-manager.php:377
 #. translators: %s: expected URL format
 msgid "Incorrect Format. Expecting: %s"
 msgstr ""
 
-#: php/class-credentials-manager.php:375
+#: php/class-credentials-manager.php:388
 msgid "URL endpoint saved. Add your API keys to enable uploads and usage stats."
 msgstr ""
 
-#: php/class-credentials-manager.php:385
+#: php/class-credentials-manager.php:398
 #. translators: %s: expected public key format
 msgid "Incorrect Public key. Expecting %s"
 msgstr ""
 
-#: php/class-credentials-manager.php:398
+#: php/class-credentials-manager.php:411
 #. translators: %s: expected private key format
 msgid "Incorrect Private key. Expecting %s"
 msgstr ""
 
-#: php/class-media.php:723
+#: php/class-media.php:724
 msgid "Invalid attachment ID."
 msgstr ""
 
@@ -67,37 +67,37 @@ msgstr ""
 msgid "ImageKit"
 msgstr ""
 
-#: php/class-plugin.php:377
+#: php/class-plugin.php:378
 msgid "Visit plugin site"
 msgstr ""
 
-#: php/class-uploader.php:408
+#: php/class-uploader.php:439
 msgid "Configure API Keys to enable uploads."
 msgstr ""
 
-#: php/class-uploader.php:416
+#: php/class-uploader.php:447
 msgid "Media Library Upload Settings"
 msgstr ""
 
-#: php/class-uploader.php:422
+#: php/class-uploader.php:453
 msgid "ImageKit folder path"
 msgstr ""
 
-#: php/class-uploader.php:428
+#: php/class-uploader.php:459
 msgid "e.g.: wordpress_assets/"
 msgstr ""
 
-#: php/class-uploader.php:431
+#: php/class-uploader.php:462
 msgid ""
 "The folder in your ImageKit account that WordPress assets are uploaded to. "
 "Leave blank to use the root of your ImageKit library."
 msgstr ""
 
-#: php/class-uploader.php:440 ui-definitions/settings-sidebar.php:24
+#: php/class-uploader.php:471 ui-definitions/settings-sidebar.php:24
 msgid "Storage"
 msgstr ""
 
-#: php/class-uploader.php:445
+#: php/class-uploader.php:476
 #. translators: the HTML for opening and closing list and its items.
 msgid ""
 "Choose where your assets are stored.%1$s<b>ImageKit and WordPress</b>: "
@@ -111,19 +111,19 @@ msgid ""
 "and disables uploading new assets to ImageKit.%5$s%6$sLearn more%7$s"
 msgstr ""
 
-#: php/class-uploader.php:459
+#: php/class-uploader.php:490
 msgid "ImageKit and WordPress"
 msgstr ""
 
-#: php/class-uploader.php:460
+#: php/class-uploader.php:491
 msgid "ImageKit and WordPress (low resolution)"
 msgstr ""
 
-#: php/class-uploader.php:461
+#: php/class-uploader.php:492
 msgid "ImageKit only"
 msgstr ""
 
-#: php/class-uploader.php:462
+#: php/class-uploader.php:493
 msgid "WordPress only"
 msgstr ""
 
@@ -561,7 +561,7 @@ msgid ""
 "%1$sreference%2$s for all available transformations and syntax."
 msgstr ""
 
-#: ui-definitions/settings-images.php:60 ui-definitions/settings-video.php:55
+#: ui-definitions/settings-images.php:60 ui-definitions/settings-video.php:112
 msgid "See examples"
 msgstr ""
 
@@ -873,6 +873,66 @@ msgstr ""
 msgid "Min"
 msgstr ""
 
+#: ui-definitions/settings-responsive.php:100
+msgid "Sizes attribute"
+msgstr ""
+
+#: ui-definitions/settings-responsive.php:110
+msgid "Sizes mode"
+msgstr ""
+
+#: ui-definitions/settings-responsive.php:111
+msgid ""
+"Choose how the \"sizes\" attribute is generated for responsive images. "
+"\"Default\" uses a simple max-width rule. \"Viewport presets\" lets you "
+"define sizes as viewport percentages for small, medium, large, and "
+"extra-large screens."
+msgstr ""
+
+#: ui-definitions/settings-responsive.php:117
+msgid "Default (max-width)"
+msgstr ""
+
+#: ui-definitions/settings-responsive.php:118
+msgid "Viewport presets (S / M / L / XL)"
+msgstr ""
+
+#: ui-definitions/settings-responsive.php:126
+msgid "Small (up to 640px)"
+msgstr ""
+
+#: ui-definitions/settings-responsive.php:127
+msgid ""
+"The image width as a viewport unit for screens up to 640px wide. Example: "
+"100vw means the image spans the full width of the screen."
+msgstr ""
+
+#: ui-definitions/settings-responsive.php:136
+msgid "Medium (up to 1024px)"
+msgstr ""
+
+#: ui-definitions/settings-responsive.php:137
+msgid "The image width as a viewport unit for screens up to 1024px wide."
+msgstr ""
+
+#: ui-definitions/settings-responsive.php:146
+msgid "Large (up to 1440px)"
+msgstr ""
+
+#: ui-definitions/settings-responsive.php:147
+msgid "The image width as a viewport unit for screens up to 1440px wide."
+msgstr ""
+
+#: ui-definitions/settings-responsive.php:156
+msgid "Extra large (above 1440px)"
+msgstr ""
+
+#: ui-definitions/settings-responsive.php:157
+msgid ""
+"The image width for screens wider than 1440px. Can be a viewport unit (e.g. "
+"33vw) or a fixed pixel value (e.g. 1200px)."
+msgstr ""
+
 #: ui-definitions/settings-sidebar.php:19
 msgid "Current usage summary"
 msgstr ""
@@ -921,7 +981,60 @@ msgstr ""
 msgid "Deliver videos from ImageKit."
 msgstr ""
 
-#: ui-definitions/settings-video.php:47
+#: ui-definitions/settings-video.php:42
+msgid "Video quality"
+msgstr ""
+
+#: ui-definitions/settings-video.php:43
+msgid ""
+"Set the quality of delivered videos (1-100). Lower values reduce file size "
+"but also reduce visual quality. Leave empty to use ImageKit defaults."
+msgstr ""
+
+#: ui-definitions/settings-video.php:48
+msgid "1-100"
+msgstr ""
+
+#: ui-definitions/settings-video.php:60
+msgid "Video format"
+msgstr ""
+
+#: ui-definitions/settings-video.php:61
+msgid ""
+"Convert videos to a specific format for delivery. \"Auto\" lets ImageKit "
+"choose the best format based on the viewer's browser. MP4 (H.264) has the "
+"widest compatibility. WebM (VP9) offers better compression for supported "
+"browsers."
+msgstr ""
+
+#: ui-definitions/settings-video.php:70
+msgid "Auto (recommended)"
+msgstr ""
+
+#: ui-definitions/settings-video.php:71
+msgid "MP4 (H.264)"
+msgstr ""
+
+#: ui-definitions/settings-video.php:72
+msgid "WebM (VP9)"
+msgstr ""
+
+#: ui-definitions/settings-video.php:78
+msgid "Auto-generate poster"
+msgstr ""
+
+#: ui-definitions/settings-video.php:79
+msgid ""
+"Automatically generate a poster thumbnail for videos using ImageKit. This "
+"provides a preview image before the video plays, improving perceived "
+"performance."
+msgstr ""
+
+#: ui-definitions/settings-video.php:83
+msgid "Generate poster thumbnails from video frames."
+msgstr ""
+
+#: ui-definitions/settings-video.php:104
 #. translators: %1$s: opening link tag, %2$s: closing link tag
 msgid ""
 "A set of additional transformations to apply to all videos. Specify your "
